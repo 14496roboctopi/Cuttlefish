@@ -44,6 +44,7 @@ class MecanumController{
         lbm = leftBack;
     }
 
+    //TODO: Fix setVec params
     fun setVec(direction: Pose, power: Double = 1.0, holdRote:Boolean = false, maxRotationPriority:Double = 1.0, rotation: Double = 0.0)
     {
         if(!holdRote)
