@@ -21,6 +21,8 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     var rad: Double = wheelRad;
     var dist: Double = wheelDist;
 
+    var localSpeed:Pose = Pose(0.0,0.0,0.0);
+
     //Position var
     override var pos: Pose = Pose(0.0,0.0,0.0);
 
@@ -80,6 +82,8 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
 
         //Calculates speed
         speed = dMove.getVecLen() / dTime;
+        localSpeed = moveStep;
+        localSpeed.scale((1.0 / dTime),true);
         rSpeed = dMove.r / dTime;
 
         //Sets previous variables
@@ -106,6 +110,8 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
 
         //Investigate first term *r
         val localArc = Pose(cos(0.5 * PI - a) * r, sin(0.5 * PI - a) * r - r);
+
+
 
         //Investigate newPos
         localArc.rotate(transDir + cPos.r);

@@ -85,6 +85,12 @@ class Pose(var x: Double = 0.0, var y: Double = 0.0, var r: Double = 0.0)
         this.x = (tPoint.x * cos(amount) - tPoint.y * sin(amount)) * len + pivot.x;
         this.y = (tPoint.y * cos(amount) + tPoint.x * sin(amount)) * len + pivot.y;
     }
+
+    override fun toString():String
+    {
+        return "X: "+x+", Y: "+y+", R:"+r;
+    }
+
 }
 /*
 int a = 5;

@@ -16,13 +16,13 @@ class GeneralQueue {
 
         var ids:String = "";
 
-        System.out.println("QueueCycle")
+//        System.out.println("QueueCycle")
         for(active in activeTasks)
         {
             ids+=active.id;
             ids+=",";
         }
-        System.out.println(ids)
+//        System.out.println(ids)
 
         for(active in taskBuffer)
         {

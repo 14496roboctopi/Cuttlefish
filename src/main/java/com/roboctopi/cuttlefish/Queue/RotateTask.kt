@@ -20,7 +20,7 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
     override fun loop(): Boolean
     {
 
-        controller.controller.setVec(Pose(0.0,0.0,goal),1.0,true);
+        controller.controller.setVec(Pose(0.0,0.0,goal),true);
 
 
         if(Math.abs(controller.localizer.pos.r-goal) >= 0.05)

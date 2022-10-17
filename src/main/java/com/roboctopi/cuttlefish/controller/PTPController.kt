@@ -69,13 +69,13 @@ class  PTPController
                 && (abs(localizer.pos.r - direction.r) > point.rSlop
                         || dist > point.tSlop))
         {
-            controller.setVec(direction, 1.0, true, 3.0, localizer.pos.r);
+            controller.setVec(direction,  true, 3.0, localizer.pos.r);
             false;
         }
         else
         {
             controller.rPID.i = 0.0;
-            if(!point.isPassthrough) controller.setVec(Pose(0.0, 0.0, 0.0), 0.0);
+            if(!point.isPassthrough) controller.setVec(Pose(0.0, 0.0, 0.0));
             true;
         }
     }
