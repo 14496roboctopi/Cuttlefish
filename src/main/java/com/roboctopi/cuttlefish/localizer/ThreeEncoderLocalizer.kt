@@ -120,6 +120,13 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
 
         return newPos;
     }
+//    private fun blendSteps(cPos: Pose, step: Pose): Pose
+//    {
+//        val newPos = Pose(cPos.x, cPos.y, cPos.r + step.r * calibConst);
+//        newPos.add(step);
+//
+//        return newPos;
+//    }
 
     private fun calcMovementStep(encStep: Pose): Pose
     {

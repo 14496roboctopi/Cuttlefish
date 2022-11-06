@@ -64,7 +64,7 @@ class MecanumController{
 
 
             var r = min(rPID.power,maxRotationPriority);
-            if(abs(r) < mecanumControllerPowerRoteAntiStallThreshold) r = 0.0;
+//            if(abs(r) < mecanumControllerPowerRoteAntiStallThreshold) r = 0.0;
 
             rPowerDebug = r;
 
