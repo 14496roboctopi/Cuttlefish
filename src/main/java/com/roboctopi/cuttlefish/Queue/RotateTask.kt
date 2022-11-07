@@ -23,7 +23,7 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
         controller.controller.setVec(Pose(0.0,0.0,goal),true);
 
 
-        if(Math.abs(controller.localizer.pos.r-goal) >= 0.05)
+        if(Math.abs(controller.localizer.pos.r-goal) >= 0.015)
         {
             println("b");
             complete = true;
