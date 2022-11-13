@@ -3,16 +3,16 @@ package com.roboctopi.cuttlefish.utils
 import kotlin.math.max
 import kotlin.math.min
 
-class PID(var pGain: Double, var iGain: Double,var  dGain: Double, initial: Double = 0.0, private var iLimit:Double = 1.0)
+open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: Double, initial: Double = 0.0, private var iLimit:Double = 1.0)
 {
     private var pErr: Double = initial;
-    var p: Double = 0.0;
-    var i: Double = 0.0;
-    var d: Double = 0.0;
+    open var p: Double = 0.0;
+    open var i: Double = 0.0;
+    open var d: Double = 0.0;
 
-    var reiniting = false;
+    open var reiniting = false;
 
-    public var power: Double = 0.0;
+    open var power: Double = 0.0;
     private var pTime: Long = System.currentTimeMillis();
 
     init {
@@ -20,7 +20,7 @@ class PID(var pGain: Double, var iGain: Double,var  dGain: Double, initial: Doub
         //System.out.println(iGain)
     }
     //TODO: Set up custom anti-wind
-    fun update(state: Double, goal: Double = 0.0): Double
+    open fun update(state: Double, goal: Double = 0.0): Double
     {
         p = goal - state;
 
@@ -49,7 +49,7 @@ class PID(var pGain: Double, var iGain: Double,var  dGain: Double, initial: Doub
         return power;
     }
 
-    fun reInit()
+    open fun reInit()
     {
         i=0.0;
         reiniting = true;
@@ -57,7 +57,7 @@ class PID(var pGain: Double, var iGain: Double,var  dGain: Double, initial: Doub
     }
 
     //TODO: This can be removed
-    fun reset(goal: Double = 0.0, initial: Double = 0.0)
+    open fun reset(goal: Double = 0.0, initial: Double = 0.0)
     {
         i = 0.0;
         pErr = goal - initial;

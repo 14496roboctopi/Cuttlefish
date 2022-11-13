@@ -3,12 +3,14 @@ package com.roboctopi.cuttlefish.utils
 import kotlin.math.max
 import kotlin.math.min
 
-class APID(var pGain: Double, var iGain: Double, var  dGain: Double, initial: Double = 0.0)
+class APID(override var pGain: Double, override var iGain: Double, override var  dGain: Double, initial: Double = 0.0,
+           iLimit: Double = 1.0
+): PID(pGain, iGain, dGain, initial, iLimit)
 {
     private var pErr: Double = initial;
-    var p: Double = 0.0;
-    var i: Double = 0.0;
-    var d: Double = 0.0;
+    override var p: Double = 0.0;
+    override var i: Double = 0.0;
+    override var d: Double = 0.0;
 
     var iLimit:Double = 1.0
     var iGrowthLimit:Double = 1.0
@@ -17,9 +19,9 @@ class APID(var pGain: Double, var iGain: Double, var  dGain: Double, initial: Do
     var dLimit = 1.0;
 
 
-    var reiniting = false;
+    override var reiniting = false;
 
-    public var power: Double = 0.0;
+    override var power: Double = 0.0;
     private var pTime: Long = System.currentTimeMillis();
 
     init {
@@ -27,7 +29,7 @@ class APID(var pGain: Double, var iGain: Double, var  dGain: Double, initial: Do
         //System.out.println(iGain)
     }
     //TODO: Set up custom anti-wind
-    fun update(state: Double, goal: Double = 0.0): Double
+    override fun update(state: Double, goal: Double): Double
     {
         p = goal - state;
 
@@ -64,7 +66,7 @@ class APID(var pGain: Double, var iGain: Double, var  dGain: Double, initial: Do
         return power;
     }
 
-    fun reInit()
+    override fun reInit()
     {
         i=0.0;
         reiniting = true;
@@ -72,7 +74,7 @@ class APID(var pGain: Double, var iGain: Double, var  dGain: Double, initial: Do
     }
 
     //TODO: This can be removed
-    fun reset(goal: Double = 0.0, initial: Double = 0.0)
+    open override fun reset(goal: Double, initial: Double)
     {
         i = 0.0;
         pErr = goal - initial;

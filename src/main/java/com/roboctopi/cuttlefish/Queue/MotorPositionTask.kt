@@ -12,6 +12,11 @@ class MotorPositionTask(var pos:Double, var motor: Motor, var enc:RotaryEncoder,
     private var initial = 0.0;
     var complete = false;
     private var enabled = true;
+    var scale = 1.0;
+    var lowerLimit = 0.0;
+    var upperLimit = 0.0;
+    var upperLimitEnabled = false;
+    var lowerLimitEnabled = false;
 
     override fun onBegin(): Boolean {
         if(relative)
@@ -51,6 +56,24 @@ class MotorPositionTask(var pos:Double, var motor: Motor, var enc:RotaryEncoder,
     {
         goal = angle;
     }
+    fun setPosition(position:Double)
+    {
+        goal = position*scale;
+        if(position>upperLimit&&upperLimitEnabled)
+        {
+            println("limiting")
+            goal = upperLimit*scale;
+        }
+        if(goal<lowerLimit&&lowerLimitEnabled)
+        {
+            goal = lowerLimit;
+        }
+    }
+    fun getPosition():Double
+    {
+        return (enc.getRotation() - initial)/scale;
+    }
+
     fun setZeroPosition()
     {
         initial = enc.getRotation();
