@@ -1,13 +1,11 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.utils
 
 import com.roboctopi.cuttlefish.components.Motor
 import com.roboctopi.cuttlefish.components.RotaryEncoder
-import com.roboctopi.cuttlefish.utils.MotorPositionController
 import com.roboctopi.cuttlefish.utils.PID
-@Deprecated("This is no longer relevant. Use MotorPositionController.", ReplaceWith("MotorPositionController"),DeprecationLevel.WARNING)
-class MotorPositionTask(var pos:Double, var motor: Motor, var enc:RotaryEncoder, var relative:Boolean): Task
+
+class MotorPositionController(var pos:Double, var motor: Motor, var enc:RotaryEncoder, var relative:Boolean)
 {
-    override val persistant = true;
     var goal = pos;
     public var pid:PID = PID(1.5,0.3,0.0);
     private var initial = 0.0;
@@ -19,7 +17,7 @@ class MotorPositionTask(var pos:Double, var motor: Motor, var enc:RotaryEncoder,
     var upperLimitEnabled = false;
     var lowerLimitEnabled = false;
 
-    override fun onBegin(): Boolean {
+    fun onBegin(): Boolean {
         if(relative)
         {
             initial = enc.getRotation();
@@ -27,13 +25,7 @@ class MotorPositionTask(var pos:Double, var motor: Motor, var enc:RotaryEncoder,
         return true;
     }
 
-    override fun loop(): Boolean {
-        if(pid.pGain == 2.0)
-        {
-            println("intake update")
-            println(pid.power)
-            println(initial)
-        }
+    fun loop(): Boolean {
         if(enabled)
         {
             motor.setPower(pid.update(enc.getRotation(),goal+initial));
@@ -82,10 +74,6 @@ class MotorPositionTask(var pos:Double, var motor: Motor, var enc:RotaryEncoder,
     fun getZeroPosition():Double
     {
         return initial;
-    }
-    override fun kill()
-    {
-        complete = true;
     }
     fun isAtGoal(epsilon: Float): Boolean
     {

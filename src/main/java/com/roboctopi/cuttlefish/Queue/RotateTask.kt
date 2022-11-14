@@ -4,6 +4,7 @@ import com.roboctopi.cuttlefish.controller.MecanumController
 import com.roboctopi.cuttlefish.controller.PTPController
 import com.roboctopi.cuttlefish.controller.Waypoint
 import com.roboctopi.cuttlefish.utils.Pose
+import kotlin.math.abs
 
 class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPController): Task
 {
@@ -20,12 +21,19 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
     override fun loop(): Boolean
     {
 
-        controller.controller.setVec(Pose(0.0,0.0,goal),true);
+        controller.controller.setVec(Pose(0.0,0.0,goal),true,0.45,controller.localizer.pos.r);
 
 
-        if(Math.abs(controller.localizer.pos.r-goal) >= 0.015)
+        if
+        (
+            Math.abs(controller.localizer.pos.r-goal) <= 0.015 ||
+            (
+                abs(controller.controller.rPID.power) < controller.controller.mecanumControllerPowerRoteAntiStallThreshold &&
+                abs(controller.localizer.rSpeed) < controller.controller.mecanumControllerSpeedRoteAntiStallThreshold
+            )
+        )
         {
-            println("b");
+            println("RotationComplete pos: "+controller.localizer.pos.r+" goal:"+goal);
             complete = true;
         }
 
@@ -34,10 +42,11 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
             controller.controller.setVec(Pose(0.0,0.0,0.0));
         }
 
-        println("a");
+        println("RotationIncomplete pos:"+controller.localizer.pos.r+" goal:"+goal);
         return complete;
     }
     override fun kill()
+
     {
         controller.controller.setVec(Pose(0.0,0.0,0.0));
         complete = true;

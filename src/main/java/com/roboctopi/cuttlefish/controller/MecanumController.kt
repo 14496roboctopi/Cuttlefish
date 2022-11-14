@@ -7,6 +7,7 @@ import com.roboctopi.cuttlefish.utils.Pose
 import com.roboctopi.cuttlefish.utils.rotationDiff
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 
@@ -63,7 +64,7 @@ class MecanumController{
             rPID.update(err,0.0);
 
 
-            var r = min(rPID.power,maxRotationPriority);
+            var r = max(min(rPID.power,maxRotationPriority),-maxRotationPriority);
 //            if(abs(r) < mecanumControllerPowerRoteAntiStallThreshold) r = 0.0;
 
             rPowerDebug = r;

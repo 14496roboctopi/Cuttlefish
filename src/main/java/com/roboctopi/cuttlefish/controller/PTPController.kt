@@ -61,7 +61,7 @@ class  PTPController
 
 
 
-
+        //TODO: Antistall is being bad: mecanumControllerSpeedRoteAntiStallThreshold is used twice
         return if((abs(power) > movePowerThreshold
                         || localizer.speed>moveSpeedThreshold
                         || abs(controller.rPID.power) > controller.mecanumControllerSpeedRoteAntiStallThreshold
