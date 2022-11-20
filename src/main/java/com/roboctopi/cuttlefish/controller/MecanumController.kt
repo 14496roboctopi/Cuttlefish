@@ -18,8 +18,8 @@ class MecanumController{
     var lbm:Motor = NullMotor();
     var rPID = PID(PI * 0.5,1500.0,2.0);
     var rote:Double = 0.0;
-    var mecanumControllerPowerRoteAntiStallThreshold = 0.11;
-    var mecanumControllerSpeedRoteAntiStallThreshold = 0.5;
+    var mecanumControllerPowerRoteAntiStallThreshold = 0.08;
+    var mecanumControllerSpeedRoteAntiStallThreshold = 0.01;
     var rPowerDebug = 0.0;
 
     constructor();

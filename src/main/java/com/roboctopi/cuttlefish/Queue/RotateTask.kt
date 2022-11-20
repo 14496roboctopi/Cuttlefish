@@ -26,14 +26,14 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
 
         if
         (
-            Math.abs(controller.localizer.pos.r-goal) <= 0.015 ||
+            Math.abs(controller.localizer.pos.r-goal) <= 0.04 &&
             (
                 abs(controller.controller.rPID.power) < controller.controller.mecanumControllerPowerRoteAntiStallThreshold &&
                 abs(controller.localizer.rSpeed) < controller.controller.mecanumControllerSpeedRoteAntiStallThreshold
             )
         )
         {
-            println("RotationComplete pos: "+controller.localizer.pos.r+" goal:"+goal);
+//            println("RotationComplete pos: "+controller.localizer.pos.r+" goal:"+goal);
             complete = true;
         }
 
@@ -42,7 +42,7 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
             controller.controller.setVec(Pose(0.0,0.0,0.0));
         }
 
-        println("RotationIncomplete pos:"+controller.localizer.pos.r+" goal:"+goal);
+//        println("RotationIncomplete pos:"+controller.localizer.pos.r+" goal:"+goal);
         return complete;
     }
     override fun kill()
