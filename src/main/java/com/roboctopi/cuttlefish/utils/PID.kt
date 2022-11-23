@@ -3,7 +3,7 @@ package com.roboctopi.cuttlefish.utils
 import kotlin.math.max
 import kotlin.math.min
 
-open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: Double, initial: Double = 0.0, private var iLimit:Double = 1.0)
+open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: Double, initial: Double = 0.0, public open var iLimit:Double = 1.0)
 {
     private var pErr: Double = initial;
     open var p: Double = 0.0;

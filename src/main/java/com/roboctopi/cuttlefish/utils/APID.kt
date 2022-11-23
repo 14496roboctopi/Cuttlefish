@@ -12,7 +12,7 @@ class APID(override var pGain: Double, override var iGain: Double, override var 
     override var i: Double = 0.0;
     override var d: Double = 0.0;
 
-    var iLimit:Double = 1.0
+    override var iLimit:Double = 1.0
     var iGrowthLimit:Double = 1.0
 
     var dFilterCoeffiecient = 0.0;
