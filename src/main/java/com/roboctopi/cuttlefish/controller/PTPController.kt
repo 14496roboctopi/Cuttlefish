@@ -2,6 +2,7 @@ package com.roboctopi.cuttlefish.controller
 
 import com.roboctopi.cuttlefish.localizer.Localizer
 import com.roboctopi.cuttlefish.localizer.NullLocalizer
+import com.roboctopi.cuttlefish.utils.Line
 import com.roboctopi.cuttlefish.utils.PID
 import com.roboctopi.cuttlefish.utils.Pose
 import kotlin.math.abs
@@ -78,5 +79,56 @@ class  PTPController
             if(!point.isPassthrough) controller.setVec(Pose(0.0, 0.0, 0.0));
             true;
         }
+    }
+
+    fun holdPosition(point: Pose,maxSpeed:Double,holdRotation: Boolean)
+    {
+        val direction:Pose = point.clone();
+        direction.setOrigin(localizer.pos, true);
+        direction.r = point.r;
+
+
+        val dist: Double = direction.getVecLen();
+        direction.normalize();
+
+        power = -mPD.update(dist);
+
+        direction.scale(Math.min(power,maxSpeed),false);
+        controller.setVec(direction,  holdRotation, 3.0, localizer.pos.r);
+    }
+
+    var perpPID = PID(1.0/(100.0),0.0,0.0);
+    fun followLine(line: Line,power:Double)
+    {
+        var guideLine = line.clone();
+        guideLine.normalize();
+        guideLine.subtract(localizer.pos);
+
+        var paraVec    :Pose = guideLine.getParaVec();
+        var perpVec    :Pose = guideLine.getPerpVec();
+        perpVec.normalize();
+        var perpDist = guideLine.getPerpDist();
+        perpPID.update(perpDist,0.0)
+
+
+        System.out.println("Perp0:" + perpVec);
+        perpVec.scale(abs(perpPID.power));
+        paraVec.scale(power);
+        System.out.println("Perp1:" + perpVec)
+        System.out.println("Pos:" + localizer.pos);
+
+        paraVec.add(perpVec,false);
+        paraVec.rotate(-localizer.pos.r);
+        paraVec.r = guideLine.getParaVec().r;
+
+//        perpVec.scale(0.0);
+//        paraVec.scale(0.0);
+
+        controller.setVec(paraVec,true,0.4,localizer.pos.r);
+
+        //Left: -1.835103951321012, Y: -0.0, R:0.0
+        //Right:   Perp:X: -2.720985176212346, Y: 0.0, R:0.0
+
+        // Outer: -217.0684841069536
     }
 }
