@@ -94,7 +94,7 @@ class  PTPController
         power = -mPD.update(dist);
 
         direction.scale(Math.min(power,maxSpeed),false);
-        controller.setVec(direction,  holdRotation, 3.0, localizer.pos.r);
+        controller.setVec(direction,  holdRotation, 1.0, localizer.pos.r);
     }
 
     var perpPID = PID(1.0/(100.0),0.0,0.0);
