@@ -16,7 +16,7 @@ class MecanumController{
     var rbm:Motor = NullMotor();
     var lfm:Motor = NullMotor();
     var lbm:Motor = NullMotor();
-    var rPID = PID(PI * 0.5,1500.0,2.0);
+    var rPID = PID(PI * 0.5,0.0,2.0);
     var rote:Double = 0.0;
     var mecanumControllerPowerRoteAntiStallThreshold = 0.08;
     var mecanumControllerSpeedRoteAntiStallThreshold = 0.01;
@@ -60,7 +60,7 @@ class MecanumController{
         else
         {
             rote = direction.r;
-            var err = rotationDiff(rotation,rote);
+            var err = rotationDiff(rote,rotation);
             rPID.update(err,0.0);
 
 

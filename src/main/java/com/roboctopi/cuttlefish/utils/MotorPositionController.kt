@@ -38,8 +38,11 @@ class MotorPositionController(var pos:Double, var motor: Motor, var enc:RotaryEn
     }
     fun enable()
     {
-        enabled = true;
-        pid.reInit();
+        if(!enabled)
+        {
+            enabled = true;
+            pid.reInit();
+        }
     }
     fun disable()
     {
