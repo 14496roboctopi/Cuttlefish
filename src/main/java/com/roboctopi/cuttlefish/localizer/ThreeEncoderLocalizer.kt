@@ -84,7 +84,7 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
         speed = dMove.getVecLen() / dTime;
         localSpeed = moveStep;
         localSpeed.scale((1.0 / dTime),true);
-        rSpeed = dMove.r / dTime;
+        rSpeed = dMove.r / (dTime/1000.0);
 
         //Sets previous variables
         pTime = t;
