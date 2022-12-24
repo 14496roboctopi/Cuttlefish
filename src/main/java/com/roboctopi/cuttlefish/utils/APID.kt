@@ -18,6 +18,8 @@ class APID(override var pGain: Double, override var iGain: Double, override var 
     var dFilterCoeffiecient = 0.0;
     var dLimit = 1.0;
 
+    public var powerLimit:Double = 1.0;
+
 
     override var reiniting = false;
 
@@ -54,6 +56,7 @@ class APID(override var pGain: Double, override var iGain: Double, override var 
 
 
         power = pGain * p + i + d;
+        power = Math.max(Math.min(power,powerLimit),-powerLimit);
 
         // @Note(sean) what the-???
         /*if(iGain==100.0)
