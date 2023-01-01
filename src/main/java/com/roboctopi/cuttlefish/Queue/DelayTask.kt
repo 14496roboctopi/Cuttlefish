@@ -1,5 +1,9 @@
 package com.roboctopi.cuttlefish.Queue
 
+/**
+ * Pause for a specified amount of time in a queue
+ * @param delay Amount of time to delay in milliseconds
+ */
 class DelayTask(var delay: Int): Task
 {
     var t: Long = 0;
