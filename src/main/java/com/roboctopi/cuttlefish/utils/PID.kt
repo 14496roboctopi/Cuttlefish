@@ -9,6 +9,7 @@ open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: 
     open var p: Double = 0.0;
     open var i: Double = 0.0;
     open var d: Double = 0.0;
+    open var f: Double = 0.0;
 
     open var reiniting = false;
 

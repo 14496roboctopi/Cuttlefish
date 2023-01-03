@@ -26,6 +26,8 @@ class APID(override var pGain: Double, override var iGain: Double, override var 
     override var power: Double = 0.0;
     private var pTime: Long = System.currentTimeMillis();
 
+    public var f_function: (Double,Double)->Double = { pos:Double,err:Double -> 0.0; }
+
     init {
         //System.out.println(i)
         //System.out.println(iGain)
@@ -54,8 +56,9 @@ class APID(override var pGain: Double, override var iGain: Double, override var 
         pureD = Math.min(Math.max(pureD,-dLimit),dLimit)
         d = (1.0-dFilterCoeffiecient)*pureD+dFilterCoeffiecient*d;
 
+        f =  f_function(state,p);
 
-        power = pGain * p + i + d;
+        power = pGain * p + i + d +f;
         power = Math.max(Math.min(power,powerLimit),-powerLimit);
 
         // @Note(sean) what the-???

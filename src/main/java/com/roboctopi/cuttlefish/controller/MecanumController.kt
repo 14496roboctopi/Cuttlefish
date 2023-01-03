@@ -1,7 +1,7 @@
 package com.roboctopi.cuttlefish.controller
 
 import com.roboctopi.cuttlefish.components.Motor
-import com.roboctopi.cuttlefish.components.NullMotor
+import com.roboctopi.cuttlefish.components.DummyMotor
 import com.roboctopi.cuttlefish.utils.PID
 import com.roboctopi.cuttlefish.utils.Pose
 import com.roboctopi.cuttlefish.utils.rotationDiff
@@ -12,10 +12,10 @@ import kotlin.math.min
 
 
 class MecanumController{
-    var rfm:Motor = NullMotor();
-    var rbm:Motor = NullMotor();
-    var lfm:Motor = NullMotor();
-    var lbm:Motor = NullMotor();
+    var rfm:Motor = DummyMotor();
+    var rbm:Motor = DummyMotor();
+    var lfm:Motor = DummyMotor();
+    var lbm:Motor = DummyMotor();
     var rPID = PID(PI * 0.5,0.0,2.0);
     var rote:Double = 0.0;
     var mecanumControllerPowerRoteAntiStallThreshold = 0.08;
