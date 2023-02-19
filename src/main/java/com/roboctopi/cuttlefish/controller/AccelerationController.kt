@@ -5,9 +5,9 @@ import com.roboctopi.cuttlefish.utils.Pose
 import java.nio.DoubleBuffer
 
 class AccelerationController (val localizer: ThreeEncoderLocalizer){
-    var friction: Pose = Pose(0.12,0.054,0.0);
-    var speedConst: Pose = Pose(1.3025,1.507,0.0);
-    var accelConst: Pose = Pose(4.0,4.0,0.0);
+    var friction: Pose = Pose(0.12,0.054*0.0,0.0);
+    var speedConst: Pose = Pose(1.2,1.507,0.0);
+    var accelConst: Pose = Pose(3000.0,2200.0,0.0);
     var smoothSpeed: Pose = Pose(0.0,0.0,0.0);
 
     fun reinit()
@@ -25,7 +25,7 @@ class AccelerationController (val localizer: ThreeEncoderLocalizer){
             smoothSpeed.add(speedDiff);
         }
 
-        power.x = getPowerAccel(targetAccel.x,smoothSpeed.x,accelConst.x,speedConst.x,friction.x);
+//        power.x = getPowerAccel(targetAccel.x,smoothSpeed.x,accelConst.x,speedConst.x,friction.x);
         power.y = getPowerAccel(targetAccel.y,smoothSpeed.y,accelConst.y,speedConst.y,friction.y);
         System.out.println(power)
         System.out.println("Smooth: "+smoothSpeed)
@@ -38,7 +38,8 @@ class AccelerationController (val localizer: ThreeEncoderLocalizer){
     }
 
     private fun getPowerAccel(accel: Double,speed: Double,aConst: Double, sConst:Double, fConst: Double): Double {
-        return getPowerFromTarget(accel / aConst + speed,Math.signum(speed),sConst,fConst);
+        var fSign = Math.signum(speed);
+        return getPowerFromTarget(accel / aConst + speed,fSign,sConst,fConst);
     }
 
 
