@@ -21,7 +21,7 @@ class AccelerationController (val localizer: ThreeEncoderLocalizer){
         if(!speedDiff.x.isNaN()&&!speedDiff.y.isNaN())
         {
             speedDiff.subtract(smoothSpeed,true);
-            speedDiff.scale(0.1);
+            speedDiff.scale(0.4);
             smoothSpeed.add(speedDiff);
         }
 
