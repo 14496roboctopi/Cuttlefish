@@ -2,45 +2,67 @@ package com.roboctopi.cuttlefish.controller
 
 import com.roboctopi.cuttlefish.localizer.ThreeEncoderLocalizer
 import com.roboctopi.cuttlefish.utils.Pose
-import java.nio.DoubleBuffer
+import com.roboctopi.cuttlefish.utils.Vector2
+import com.roboctopi.cuttlefish.utils.Vector3
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.math.sign
 
-class AccelerationController (val localizer: ThreeEncoderLocalizer){
-    var friction: Pose = Pose(0.12,0.054*0.0,0.0);
-    var speedConst: Pose = Pose(1.2,1.507,0.0);
-    var accelConst: Pose = Pose(3000.0,2200.0,0.0);
-    var smoothSpeed: Pose = Pose(0.0,0.0,0.0);
+class AccelerationController (){
+    var friction: Double = 0.0;
+    var speedConst: Double = 1.507;
+    var accelConst: Double = 2.0;
+    var filterVelocity: Double = 0.0;
+    var maxVelocity: Double = 1.0;
+    var maxAccel:Double = 2.0;
+    var accelScale:Double = 2.5;
 
-    fun reinit()
-    {
-        smoothSpeed = localizer.localSpeed;
-    }
-    fun update(targetAccel:Pose):Pose
+    var profile : Vector2 = Vector2(1.2429182492,0.108877410042);
+
+    fun update(velocity:Double)
     {
         var power = Pose(0.0,0.0,0.0);
-        var speedDiff = localizer.localSpeed;
-        if(!speedDiff.x.isNaN()&&!speedDiff.y.isNaN())
+        var speedDiff = velocity-filterVelocity;
+        if(!velocity.isNaN())
         {
-            speedDiff.subtract(smoothSpeed,true);
-            speedDiff.scale(0.4);
-            smoothSpeed.add(speedDiff);
+            filterVelocity += speedDiff*0.4;
         }
-
-//        power.x = getPowerAccel(targetAccel.x,smoothSpeed.x,accelConst.x,speedConst.x,friction.x);
-        power.y = getPowerAccel(targetAccel.y,smoothSpeed.y,accelConst.y,speedConst.y,friction.y);
-        System.out.println(power)
-        System.out.println("Smooth: "+smoothSpeed)
-        return power;
     }
 
-    private fun getPowerFromTarget(target: Double,fSign:Double, sConst:Double, fConst: Double): Double {
-        val friction = fConst;
-        return (target + fSign * friction) / sConst;
+
+    private fun getPowerFromTarget(target: Double,): Double {
+        var fSign = sign(filterVelocity);
+        return (target + fSign * friction) / speedConst;
     }
 
-    private fun getPowerAccel(accel: Double,speed: Double,aConst: Double, sConst:Double, fConst: Double): Double {
-        var fSign = Math.signum(speed);
-        return getPowerFromTarget(accel / aConst + speed,fSign,sConst,fConst);
+    private fun getPowerAccel(accel: Double): Double {
+        return getPowerFromTarget(accel / accelConst + filterVelocity);
     }
+
+    public fun getPowerToGoal(position:Double,goal:Double): Double
+    {
+        var err = goal-position;
+        var absErr = abs(err);
+        var targetV =  profile.x * Math.pow(absErr, 1.0 / 2.0) + profile.y * absErr;
+        println("TARGETVUNMIN: "+targetV)
+        targetV = min(targetV,maxVelocity);
+        val goalAccel: Double = Math.min(accelScale*(targetV - filterVelocity), maxAccel)* sign(err);
+        println("TARGETV: "+targetV)
+        println("REALV: "+filterVelocity)
+        println("GOAL ACCEL: "+goalAccel);
+        println("Error: "+absErr);
+        if(filterVelocity<targetV*sign(err))
+        {
+            var power = getPowerAccel(goalAccel);
+            println("POWER: "+power);
+            return power;
+        }
+        else
+        {
+            return Math.signum(filterVelocity)*0.03;
+        }
+    }
+
 
 
 }
