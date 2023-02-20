@@ -12,12 +12,12 @@ class AccelerationController (){
     var friction: Double = 0.0;
     var speedConst: Double = 1.507;
     var accelConst: Double = 2.0;
+    var profile : Vector2 = Vector2(1.2429182492,0.108877410042);
+
     var filterVelocity: Double = 0.0;
     var maxVelocity: Double = 1.0;
     var maxAccel:Double = 2.0;
     var accelScale:Double = 2.5;
-
-    var profile : Vector2 = Vector2(1.2429182492,0.108877410042);
 
     fun update(velocity:Double)
     {
@@ -50,12 +50,16 @@ class AccelerationController (){
         println("TARGETV: "+targetV)
         println("REALV: "+filterVelocity)
         println("GOAL ACCEL: "+goalAccel);
-        println("Error: "+absErr);
+        println("Error: "+err);
         if(filterVelocity<targetV*sign(err))
         {
             var power = getPowerAccel(goalAccel);
             println("POWER: "+power);
             return power;
+        }
+        else if(filterVelocity/targetV>1.4)
+        {
+            return 0.0;
         }
         else
         {
