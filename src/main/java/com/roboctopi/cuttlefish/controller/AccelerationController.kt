@@ -66,7 +66,4 @@ class AccelerationController (){
             return Math.signum(filterVelocity)*0.03;
         }
     }
-
-
-
 }

@@ -6,6 +6,7 @@ import com.roboctopi.cuttlefish.utils.Line
 import com.roboctopi.cuttlefish.utils.PID
 import com.roboctopi.cuttlefish.utils.Pose
 import kotlin.math.abs
+import kotlin.math.sign
 
 class  PTPController
 {
@@ -131,40 +132,58 @@ class  PTPController
 
         // Outer: -217.0684841069536
     }
-    fun followLine(line: Line,power:Double,pPID: PID,rPID:PID)
+//    fun followLine(line: Line,power:Double,pPID: PID,rPID:PID)
+//    {
+//        var guideLine = line.clone();
+//        guideLine.normalize();
+//        guideLine.subtract(localizer.pos);
+//
+//        var paraVec    :Pose = guideLine.getParaVec();
+//        var perpVec    :Pose = guideLine.getPerpVec();
+//        perpVec.normalize();
+//        var perpDist = guideLine.getPerpDist();
+//        pPID.update(perpDist,0.0)
+//
+//
+////        System.out.println("Perp0:" + perpVec);
+//        perpVec.scale(abs(pPID.power));
+//        paraVec.scale(power);
+////        System.out.println("Perp1:" + perpVec)
+////        System.out.println("Pos:" + localizer.pos);
+//
+//        paraVec.add(perpVec,false);
+//        paraVec.rotate(-localizer.pos.r);
+//        paraVec.r = guideLine.getParaVec().r;
+//
+//        rPID.update(-paraVec.r,localizer.pos.r);
+//        paraVec.r = rPID.power;
+//
+////        perpVec.scale(0.0);
+////        paraVec.scale(0.0);
+//
+//        controller.setVec(paraVec,false,0.4,localizer.pos.r);
+//
+//        //Left: -1.835103951321012, Y: -0.0, R:0.0
+//        //Right:   Perp:X: -2.720985176212346, Y: 0.0, R:0.0
+//
+//        // Outer: -217.0684841069536
+//    }
+    fun followLine(line: Line,power: Double,angle:Double,pPID: PID,rPID:PID)
     {
-        var guideLine = line.clone();
-        guideLine.normalize();
-        guideLine.subtract(localizer.pos);
+        line.normalize();
+        var relativeCoords = line.getRelativeCoords(localizer.pos);
 
-        var paraVec    :Pose = guideLine.getParaVec();
-        var perpVec    :Pose = guideLine.getPerpVec();
-        perpVec.normalize();
-        var perpDist = guideLine.getPerpDist();
-        pPID.update(perpDist,0.0)
+        var sidePower = pPID.update(relativeCoords.x,0.0);
 
+        var powerVec = line.getParaVec();
+        var perp = line.getPerpVec();
 
-//        System.out.println("Perp0:" + perpVec);
-        perpVec.scale(abs(pPID.power));
-        paraVec.scale(power);
-//        System.out.println("Perp1:" + perpVec)
-//        System.out.println("Pos:" + localizer.pos);
+        powerVec.scale(power);
+        perp.scale(sidePower);
+        powerVec.add(perp);
+        rPID.update(localizer.pos.r,angle);
+        powerVec.r = rPID.power;
 
-        paraVec.add(perpVec,false);
-        paraVec.rotate(-localizer.pos.r);
-        paraVec.r = guideLine.getParaVec().r;
-
-        rPID.update(-paraVec.r,localizer.pos.r);
-        paraVec.r = rPID.power;
-
-//        perpVec.scale(0.0);
-//        paraVec.scale(0.0);
-
-        controller.setVec(paraVec,false,0.4,localizer.pos.r);
-
-        //Left: -1.835103951321012, Y: -0.0, R:0.0
-        //Right:   Perp:X: -2.720985176212346, Y: 0.0, R:0.0
-
-        // Outer: -217.0684841069536
+        controller.setVec(powerVec);
     }
 }
