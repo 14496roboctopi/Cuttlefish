@@ -22,7 +22,7 @@ class Line(var px:Double, var py:Double, var vx:Double, var vy:Double)
     }
     fun getPerpVec():Pose
     {
-        return Pose(vy,vx,0.0);
+        return Pose(-vy,vx,0.0);
     }
     fun getPosition(t:Double):Pose
     {
