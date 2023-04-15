@@ -71,6 +71,14 @@ class Line(var px:Double, var py:Double, var vx:Double, var vy:Double)
 
         return Pose(-(transLine.px*transLine.vy-transLine.py*transLine.vx),-(transLine.vx*transLine.px+transLine.vy*transLine.py),0.0);
     }
+    fun getDist(position: Pose):Double
+    {
+        var transLine = this.clone();
+        transLine.normalize();
+
+        return -transLine.vy*(position.x-transLine.px)+transLine.vx*(position.y-transLine.py)
+    }
+
 
 
 }
