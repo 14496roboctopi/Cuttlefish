@@ -30,11 +30,8 @@ class Line(var px:Double, var py:Double, var vx:Double, var vy:Double)
     }
     fun getPerpDist():Double
     {
-        var perp = getPerpVec();
-        var dist = getPerpVec().getVecLen();
-        var outerProd = perp.x*vy-perp.y*vx;
-//        println("Outer: "+outerProd);
-        return dist * sign(outerProd);
+        this.normalize();
+        return px*vy-py*vx;
     }
     fun getParaDist():Double
     {
