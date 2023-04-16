@@ -133,7 +133,7 @@ class  PTPController
 
         // Outer: -217.0684841069536
     }
-    fun followLine(line: Line,power:Double,pPID: PID,rPID:PID)
+    fun followLine(line: Line,power:Double,pPID: PID)
     {
         var guideLine = line.clone();
         guideLine.normalize();
@@ -156,13 +156,14 @@ class  PTPController
         paraVec.rotate(-localizer.pos.r);
         paraVec.r = guideLine.getParaVec().r;
 
-        rPID.update(-paraVec.r,localizer.pos.r);
-        paraVec.r = rPID.power;
+//        rPID.update(-paraVec.r,localizer.pos.r);
+//        paraVec.r = rPID.power;
 
 //        perpVec.scale(0.0);
 //        paraVec.scale(0.0);
 
-        controller.setVec(paraVec,false,0.4,localizer.pos.r);
+        controller.setVec(paraVec,true,0.4,localizer.pos.r);
+
 
         //Left: -1.835103951321012, Y: -0.0, R:0.0
         //Right:   Perp:X: -2.720985176212346, Y: 0.0, R:0.0
