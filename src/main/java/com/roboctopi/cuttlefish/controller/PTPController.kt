@@ -114,7 +114,7 @@ class  PTPController
 
 
 //        System.out.println("Perp0:" + perpVec);
-        perpVec.scale(abs(perpPID.power));
+        perpVec.scale(perpPID.power);
         paraVec.scale(power);
 //        System.out.println("Perp1:" + perpVec)
 //        System.out.println("Pos:" + localizer.pos);
