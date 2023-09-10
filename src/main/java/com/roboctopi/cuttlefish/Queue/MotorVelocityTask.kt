@@ -7,7 +7,6 @@ import com.roboctopi.cuttlefish.utils.PID
 class MotorVelocityTask(var target:Double, val motor: Motor,
                         val encoder: RotaryEncoder, val pid: PID): Task
 {
-    override val persistant = true;
     var complete = false;
 
     var pT   = System.currentTimeMillis();

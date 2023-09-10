@@ -2,7 +2,6 @@ package com.roboctopi.cuttlefish.Queue
 
 class LogTask(var text: String): Task
 {
-    override val persistant = false;
     override fun onBegin(): Boolean
     {
         return true;

@@ -7,7 +7,6 @@ package com.roboctopi.cuttlefish.Queue
 class DelayTask(var delay: Int): Task
 {
     var t: Long = 0;
-    override val persistant = false;
     override fun onBegin(): Boolean
     {
         t = System.currentTimeMillis();

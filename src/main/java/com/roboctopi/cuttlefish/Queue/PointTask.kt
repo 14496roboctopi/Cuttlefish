@@ -6,7 +6,6 @@ import com.roboctopi.cuttlefish.utils.Pose
 
 class PointTask(val goal: Waypoint, val controller: PTPController): Task
 {
-    override val persistant = false;
     private var killed = false;
     override fun onBegin(): Boolean {
         controller.controller.rPID.reInit();

@@ -3,7 +3,6 @@ package com.roboctopi.cuttlefish.Queue
 class TaskList(): Task
 {
     var queue:TaskQueue = TaskQueue();
-    override val persistant = false;
     init
     {
         queue.pause();

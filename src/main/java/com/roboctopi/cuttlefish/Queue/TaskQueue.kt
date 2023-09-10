@@ -9,28 +9,11 @@ class TaskQueue
     var tasks = LinkedList<Task>();
     var task: Task = NullTask();
     var paused = false;
-    private var persistantTasks = ArrayList<Task>();
-
-    private var completePersistants = ArrayList<Task>();
-
     fun update()
     {
         if(!paused)
         {
             var done = task.loop();
-            for(pTask in persistantTasks)
-            {
-                var pDone = pTask.loop();
-                if(pDone)
-                {
-                    completePersistants.add(pTask);
-                }
-            }
-            for(rTask in completePersistants)
-            {
-                persistantTasks.remove(rTask);
-            }
-            completePersistants.clear();
 
             if(done)
             {
@@ -77,15 +60,7 @@ class TaskQueue
 
     fun addTask(taskToAdd :Task)
     {
-        if(taskToAdd.persistant)
-        {
-            persistantTasks.add(taskToAdd);
-            taskToAdd.onBegin();
-        }
-        else
-        {
-            tasks.add(taskToAdd);
-        }
+        tasks.add(taskToAdd);
         if(getIdle()&&!paused)
         {
             nextTask();
@@ -94,6 +69,6 @@ class TaskQueue
 
     fun getIdle():Boolean
     {
-        return (task is NullTask)&&persistantTasks.isEmpty();
+        return (task is NullTask);
     }
 }

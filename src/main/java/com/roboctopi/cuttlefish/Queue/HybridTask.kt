@@ -2,7 +2,6 @@ package com.roboctopi.cuttlefish.Queue
 
 class HybridTask(val task1:Task,val task2:Task): Task
 {
-    override val persistant = false;
     var t1Complete = false;
     var t2Complete = false;
     override fun onBegin(): Boolean

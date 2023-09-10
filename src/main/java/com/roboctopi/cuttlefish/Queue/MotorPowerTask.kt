@@ -6,8 +6,6 @@ import com.roboctopi.cuttlefish.utils.PID
 
 class MotorPowerTask(val power:Double,val motor:Motor): Task
 {
-    override val persistant = false;
-
     override fun onBegin(): Boolean {
         return true;
     }

@@ -1,13 +1,13 @@
 package com.roboctopi.cuttlefish.Queue
 
-class SetMotorPositionTask(val position:Double, val task:MotorPositionTask): Task
-{
-    override val persistant = false;
+import com.roboctopi.cuttlefish.utils.MotorPositionController
 
+class SetMotorPositionTask(val position:Double, val ctrlr:MotorPositionController): Task
+{
     override fun loop(): Boolean
     {
         System.out.println("Set Motor Position to " + position);
-        task.setAngle(position);
+        ctrlr.setAngle(position);
         return true;
     }
 }

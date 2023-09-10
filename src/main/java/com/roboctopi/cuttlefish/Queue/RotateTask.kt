@@ -8,7 +8,6 @@ import kotlin.math.abs
 
 class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPController): Task
 {
-    override val persistant = false;
     var complete = false;
     override fun onBegin(): Boolean
     {
