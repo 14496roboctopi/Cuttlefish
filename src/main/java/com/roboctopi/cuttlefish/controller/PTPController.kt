@@ -1,85 +1,60 @@
 package com.roboctopi.cuttlefish.controller
 
 import com.roboctopi.cuttlefish.localizer.Localizer
-import com.roboctopi.cuttlefish.localizer.NullLocalizer
 import com.roboctopi.cuttlefish.utils.Line
 import com.roboctopi.cuttlefish.utils.PID
 import com.roboctopi.cuttlefish.utils.Pose
-import com.roboctopi.cuttlefish.utils.rotationDiff
+import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.sign
 
-class  PTPController
+class  PTPController(var controller:MecanumBasic, var localizer: Localizer)
 {
     //Var init
-    var controller = MecanumController();
-    var localizer:Localizer = NullLocalizer();
+    var translational_PD_ctrlr:PID = PID(0.005, 0.0, 0.1);
+    var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.0,2.0);
+    var movePowerAntistallThreshold = 0.2;
+    var moveSpeedAntistallThreshold = 0.015;
+    var rotatePowerAntistallThreshold = 0.0;
+    var rotateSpeedAntistallThreshold = 0.0;
+    var rotationPowerLimit = 1.0;
 
-    var mPD:PID = PID(0.005, 0.0, 0.1);
-    var dir:Pose = Pose(0.0, 0.0, 0.0);
-    var rPos:Pose = Pose(0.0, 0.0, 0.0);
-    var pPos:Pose = Pose(0.0, 0.0, 0.0);
-    var distance:Double = 0.0;
-    var power:Double = 0.0;
+    var power:Double = 0.0
+        private set
 
-    var movePowerThreshold = 0.2;
-    var moveSpeedThreshold = 0.015;
-
-    constructor(mecController: MecanumController,
-                localizer: Localizer)
-    {
-        controller = mecController;
-        this.localizer = localizer;
-    }
-
-    constructor(mecController: MecanumController,
-                localizer: Localizer,movePD:PID,
-                movePowerThreshold:Double,
-                moveSpeedThreshold:Double)
-    {
-        controller = mecController;
-        this.localizer = localizer;
-        mPD = movePD;
-        this.movePowerThreshold = movePowerThreshold;
-        this.moveSpeedThreshold = moveSpeedThreshold;
-    }
 
     fun gotoPointLoop(point:Waypoint, endPoint: Pose = Pose(0.0, 0.0, 0.0)): Boolean {
+        //Find translation power
         val direction:Pose = point.position.clone();
         direction.setOrigin(localizer.pos, true);
-        direction.r = point.position.r;
-        rPos = localizer.pos;
-        pPos = point.position;
 
-
-        val dist: Double;
-        dist = direction.getVecLen();
+        val dist: Double = direction.getVecLen();
         direction.normalize();
 
-        power = -mPD.update(dist);
+        power = -translational_PD_ctrlr.update(dist);
 
-        direction.scale(Math.min(power,point.maxSpeed),false);
+        direction.scale(power.coerceAtMost(point.maxSpeed),false);
 
-        //return if((Math.abs(power) > 0.2||localizer.speed>0.015) &&(Math.abs(localizer.pos.r-direction.r)>point.rSlop||dist>point.tSlop))
+        direction.r = rotational_PID_ctrlr.update(localizer.pos.r,point.position.r);
+        direction.r = direction.r.coerceIn(-rotationPowerLimit,rotationPowerLimit);
 
 
+        val motionStalled = abs(power) < movePowerAntistallThreshold && localizer.speed<moveSpeedAntistallThreshold;
+        val rotationStalled = abs(direction.r) < rotatePowerAntistallThreshold && abs(localizer.rSpeed) < rotateSpeedAntistallThreshold;
 
-        //TODO: Antistall is being bad: mecanumControllerSpeedRoteAntiStallThreshold is used twice
-        return if((abs(power) > movePowerThreshold
-                        || localizer.speed>moveSpeedThreshold
-                        || abs(controller.rPID.power) > controller.mecanumControllerSpeedRoteAntiStallThreshold
-                        || abs(localizer.rSpeed) > controller.mecanumControllerSpeedRoteAntiStallThreshold)
-                && (abs(localizer.pos.r - direction.r) > point.rSlop
-                        || dist > point.tSlop))
+        val rotationReached = abs(localizer.pos.r - direction.r) < point.rSlop;
+        val positionReached = dist < point.tSlop;
+
+
+        return if( (motionStalled && rotationStalled) || (rotationReached && positionReached) )
         {
-            controller.setVec(direction,  true, 3.0, localizer.pos.r);
-            false;
+            rotational_PID_ctrlr.i = 0.0;
+            if(!point.isPassthrough) controller.setVec(Pose(0.0, 0.0, 0.0));
+            true;
         }
         else
         {
-            controller.rPID.i = 0.0;
-            if(!point.isPassthrough) controller.setVec(Pose(0.0, 0.0, 0.0));
-            true;
+            controller.setVec(direction);
+            false;
         }
     }
 
@@ -93,12 +68,15 @@ class  PTPController
         val dist: Double = direction.getVecLen();
         direction.normalize();
 
-        power = -mPD.update(dist);
+        power = -translational_PD_ctrlr.update(dist);
 
         direction.scale(Math.min(power,maxSpeed),false);
-        controller.setVec(direction,  holdRotation, 1.0, localizer.pos.r);
+        controller.setVec(direction);
     }
 
+
+
+    //TODO: THIS MUST BE REIMPLIMENTED - Logan 2023-09-10
     var perpPID = PID(1.0/(100.0),0.0,0.0);
     fun followLine(line: Line,power:Double)
     {
@@ -126,13 +104,14 @@ class  PTPController
 //        perpVec.scale(0.0);
 //        paraVec.scale(0.0);
 
-        controller.setVec(paraVec,true,0.4,localizer.pos.r);
+        controller.setVec(paraVec);
 
         //Left: -1.835103951321012, Y: -0.0, R:0.0
         //Right:   Perp:X: -2.720985176212346, Y: 0.0, R:0.0
 
         // Outer: -217.0684841069536
     }
+    //TODO: THIS MUST BE REIMPLIMENTED - Logan 2023-09-10
     fun followLine(line: Line,power:Double,pPID: PID)
     {
         var guideLine = line.clone();
@@ -163,7 +142,7 @@ class  PTPController
 //        perpVec.scale(0.0);
 //        paraVec.scale(0.0);
 
-        controller.setVec(paraVec,true,0.4,localizer.pos.r);
+        controller.setVec(paraVec);
 
 
         //Left: -1.835103951321012, Y: -0.0, R:0.0

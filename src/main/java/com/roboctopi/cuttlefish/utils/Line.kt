@@ -3,7 +3,7 @@ package com.roboctopi.cuttlefish.utils
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
-
+//TODO: THIS MUST BE REIMPLIMENTED - Logan 2023-09-10
 class Line(var px:Double, var py:Double, var vx:Double, var vy:Double)
 {
     fun length():Double
@@ -75,7 +75,4 @@ class Line(var px:Double, var py:Double, var vx:Double, var vy:Double)
 
         return -transLine.vy*(position.x-transLine.px)+transLine.vx*(position.y-transLine.py)
     }
-
-
-
 }

@@ -3,7 +3,6 @@ package com.roboctopi.cuttlefish.Queue
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.reflect.typeOf
-//TODO: Add persistent tasks
 class TaskQueue
 {
     var tasks = LinkedList<Task>();

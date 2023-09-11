@@ -1,6 +1,6 @@
 package com.roboctopi.cuttlefish.utils
 
-class BasicNoiseFilter(val smoothing:Double){
+class ExponentialFilter(val smoothing:Double){
     var state:Double = 0.0;
     fun update(newState:Double)
     {

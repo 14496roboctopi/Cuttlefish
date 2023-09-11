@@ -1,8 +1,6 @@
 package com.roboctopi.cuttlefish.Queue
 
-import com.roboctopi.cuttlefish.controller.MecanumController
 import com.roboctopi.cuttlefish.controller.PTPController
-import com.roboctopi.cuttlefish.controller.Waypoint
 import com.roboctopi.cuttlefish.utils.Pose
 import kotlin.math.abs
 
