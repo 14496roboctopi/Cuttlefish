@@ -7,9 +7,17 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * @param left Left encoder
+ * @param side Side encoder
+ * @param right Right encoder
+ * @param wheelRad Radius of the encoder wheels
+ * @param wheelDist Distance between the two forward wheels
+ *
+ */
 class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: RotaryEncoder,
                             wheelRad: Double, wheelDist: Double,
-                            rotaryCalibrationConstant: Double,val sideMovementPerRadian: Double): Localizer
+                            rotaryCalibrationConstant: Double): Localizer
 {
     //Var init
     val l: RotaryEncoder = left;
@@ -44,7 +52,7 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     init {
         this.relocalize();
     }
-    fun reset()
+    override fun reset()
     {
         pEnc = Pose(l.getRotation(),r.getRotation(),s.getRotation());
         pPos = Pose(0.0,0.0,0.0);
@@ -52,6 +60,9 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
         pos = Pose(0.0,0.0,0.0);
     }
 
+    /**
+     * Update robot position based on encoder data
+     */
     override fun relocalize()
     {
         //Gets enc position
@@ -133,8 +144,6 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
         //Var init
         val step = Pose(0.0,0.0,0.0);
 
-
-        encStep.r+=sideMovementPerRadian*step.r;
         //Converts rotation into distance traveled
         encStep.scale(this.rad, true);
 

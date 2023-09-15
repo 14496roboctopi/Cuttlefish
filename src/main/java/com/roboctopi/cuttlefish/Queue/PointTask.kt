@@ -4,6 +4,10 @@ import com.roboctopi.cuttlefish.controller.PTPController
 import com.roboctopi.cuttlefish.controller.Waypoint
 import com.roboctopi.cuttlefish.utils.Pose
 
+/** Move the robot to a target position using a point to point controller
+ * @param goal Waypoint describing the target position
+ * @param controller Point to point controller
+ * */
 class PointTask(val goal: Waypoint, val controller: PTPController): Task
 {
     private var killed = false;

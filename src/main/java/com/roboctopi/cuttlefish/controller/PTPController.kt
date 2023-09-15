@@ -32,7 +32,7 @@ class  PTPController(var controller:MecanumBasic, var localizer: Localizer)
 
         power = -translational_PD_ctrlr.update(dist);
 
-        direction.scale(power.coerceAtMost(point.maxSpeed),false);
+        direction.scale(power.coerceAtMost(point.maxPower),false);
 
         direction.r = rotational_PID_ctrlr.update(localizer.pos.r,point.position.r);
         direction.r = direction.r.coerceIn(-rotationPowerLimit,rotationPowerLimit);

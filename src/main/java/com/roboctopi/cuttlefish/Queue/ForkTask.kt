@@ -1,6 +1,11 @@
 package com.roboctopi.cuttlefish.Queue
 
-class HybridTask(val task1:Task,val task2:Task): Task
+/** Runs two tasks concurrently. Will wait for both tasks to complete before moving on. This can be used with TaskList for complex behavior
+ * @see com.roboctopi.cuttlefish.Queue.TaskList
+ * @param task1
+ * @param task2
+ * */
+class ForkTask(val task1:Task, val task2:Task): Task
 {
     var t1Complete = false;
     var t2Complete = false;

@@ -13,4 +13,5 @@ interface Localizer {
         set(value) = TODO()
 
     fun relocalize() {};
+    fun reset(){};
 }

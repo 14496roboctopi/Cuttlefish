@@ -2,7 +2,9 @@ package com.roboctopi.cuttlefish.Queue
 
 import com.roboctopi.cuttlefish.localizer.Localizer
 
-
+/**
+ * Set the localizer rotation
+ * */
 class ResetRotationTask(var rotation: Double, var localizer: Localizer): Task
 {
     override fun onBegin(): Boolean

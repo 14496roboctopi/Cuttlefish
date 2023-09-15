@@ -4,6 +4,12 @@ import com.roboctopi.cuttlefish.components.Motor
 import com.roboctopi.cuttlefish.components.RotaryEncoder
 import com.roboctopi.cuttlefish.utils.PID
 
+/** Task that controls the velocity of a motor using a PID controller. Stop task using kill function.
+ * @param target Target Velocity
+ * @param motor Motor
+ * @param encoder Motor Encoder
+ * @param pid PID controller for the velocity
+ * */
 class MotorVelocityTask(var target:Double, val motor: Motor,
                         val encoder: RotaryEncoder, val pid: PID): Task
 {
@@ -33,6 +39,10 @@ class MotorVelocityTask(var target:Double, val motor: Motor,
 
         return complete;
     }
+    /**
+     * Set the target velocity
+     * @param speed Speed
+     * */
     fun setSpeed(speed:Double)
     {
         target = speed;
