@@ -1,13 +1,8 @@
 package com.roboctopi.cuttlefish.controller
 
 import com.roboctopi.cuttlefish.components.Motor
-import com.roboctopi.cuttlefish.components.DummyMotor
-import com.roboctopi.cuttlefish.utils.PID
 import com.roboctopi.cuttlefish.utils.Pose
-import com.roboctopi.cuttlefish.utils.rotationDiff
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -17,7 +12,7 @@ import kotlin.math.min
  * @param lf_motor Left Front Motor
  * @param lb_motor Left Back Motor
  */
-class MecanumBasic (var rf_motor: Motor, var rb_motor: Motor, var lf_motor: Motor, var lb_motor: Motor){
+class MecanumController (var rf_motor: Motor, var rb_motor: Motor, var lf_motor: Motor, var lb_motor: Motor){
     /**
      * Set the direction that the robot is moving
      * @param direction Vector to apply power along

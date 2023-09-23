@@ -7,7 +7,7 @@ import com.roboctopi.cuttlefish.utils.Pose
 import kotlin.math.PI
 import kotlin.math.abs
 
-class  PTPController(var controller:MecanumBasic, var localizer: Localizer)
+class  PTPController(var controller:MecanumController, var localizer: Localizer)
 {
     //Var init
     var translational_PD_ctrlr:PID = PID(0.005, 0.0, 0.1);
