@@ -12,7 +12,7 @@ class PointTask(val goal: Waypoint, val controller: PTPController): Task
 {
     private var killed = false;
     override fun onBegin(): Boolean {
-        controller.controller.rPID.reInit();
+//        controller.controller.rPID.reInit();
         return true;
     }
     override fun loop(): Boolean

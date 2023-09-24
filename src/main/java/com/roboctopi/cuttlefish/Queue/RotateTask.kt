@@ -21,29 +21,30 @@ class RotateTask(var goal: Double, val relative:Boolean, val controller: PTPCont
         }
         return true;
     }
+    //TODO:Stuff is commented
     override fun loop(): Boolean
     {
 
-        controller.controller.setVec(Pose(0.0,0.0,goal),true,0.45,controller.localizer.pos.r);
+//        controller.controller.setVec(Pose(0.0,0.0,goal),true,0.45,controller.localizer.pos.r);
 
 
-        if
-        (
-            Math.abs(controller.localizer.pos.r-goal) <= 0.04 &&
-            (
-                abs(controller.controller.rPID.power) < controller.controller.mecanumControllerPowerRoteAntiStallThreshold &&
-                abs(controller.localizer.rSpeed) < controller.controller.mecanumControllerSpeedRoteAntiStallThreshold
-            )
-        )
-        {
-//            println("RotationComplete pos: "+controller.localizer.pos.r+" goal:"+goal);
-            complete = true;
-        }
-
-        if(complete)
-        {
-            controller.controller.setVec(Pose(0.0,0.0,0.0));
-        }
+//        if
+//        (
+//            Math.abs(controller.localizer.pos.r-goal) <= 0.04 &&
+//            (
+//                abs(controller.controller.rPID.power) < controller.controller.mecanumControllerPowerRoteAntiStallThreshold &&
+//                abs(controller.localizer.rSpeed) < controller.controller.mecanumControllerSpeedRoteAntiStallThreshold
+//            )
+//        )
+//        {
+////            println("RotationComplete pos: "+controller.localizer.pos.r+" goal:"+goal);
+//            complete = true;
+//        }
+//
+//        if(complete)
+//        {
+//            controller.controller.setVec(Pose(0.0,0.0,0.0));
+//        }
 
 //        println("RotationIncomplete pos:"+controller.localizer.pos.r+" goal:"+goal);
         return complete;
