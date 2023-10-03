@@ -3,6 +3,13 @@ package com.roboctopi.cuttlefish.utils
 import kotlin.math.max
 import kotlin.math.min
 
+
+/**
+ * PID Controller
+ * @param pGain Proportional gain
+ * @param iGain Integral gain. Integral increases at a rate of (iGain * error) power per second.
+ * @param dGain Derivative gain. Power is equal to dGain times error change per second.
+ * */
 open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: Double, initial: Double = 0.0, public open var iLimit:Double = 1.0)
 {
     private var pErr: Double = initial;
@@ -14,53 +21,45 @@ open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: 
     open var reiniting = false;
 
     open var power: Double = 0.0;
-    private var pTime: Long = System.currentTimeMillis();
+    private var pTime: Long = System.nanoTime();
 
-    init {
-        //System.out.println(i)
-        //System.out.println(iGain)
-    }
-    //TODO: Set up custom anti-wind
+    /**
+     * Update PID control loop
+     * @param state New state
+     * @param goal
+     * */
     open fun update(state: Double, goal: Double = 0.0): Double
     {
         p = goal - state;
 
         if(reiniting)
         {
-            System.out.println("Reeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeinit")
             reiniting = false
             pErr=p;
         }
 
-        var t = System.currentTimeMillis();
+        var tNano = System.nanoTime();
 
-        i += iGain * p * 0.1 * ((t - pTime).toDouble() / 1000);
+        var dT = (tNano - pTime).toDouble() / (1000.0*1000.0*1000.0);
+
+        i += iGain * p * dT;
         i = max(min(i, iLimit), -iLimit);
-        d = (p - pErr) / (t - pTime);
+        d = (p - pErr) / dT;
         power = pGain * p + i + d * dGain;
 
-        // @Note(sean) what the-???
-        /*if(iGain==100.0)
-        {
-            println(i);
-        }*/
-
         pErr = p;
-        pTime = t;
+        pTime = tNano;
         return power;
     }
-
+    /**
+     * Clears the Integral and derivative values.
+     * This should be used if a PID controller has not been in use for an extend period of time (more than a loop cycle) to avoid extreme integral build up.
+     * */
     open fun reInit()
     {
         i=0.0;
         reiniting = true;
-        pTime = System.currentTimeMillis();
+        pTime = System.nanoTime();
     }
 
-    //TODO: This can be removed
-    open fun reset(goal: Double = 0.0, initial: Double = 0.0)
-    {
-        i = 0.0;
-        pErr = goal - initial;
-    }
 }

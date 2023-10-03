@@ -78,11 +78,4 @@ class APID(override var pGain: Double, override var iGain: Double, override var 
         reiniting = true;
         pTime = System.currentTimeMillis();
     }
-
-    //TODO: This can be removed
-    open override fun reset(goal: Double, initial: Double)
-    {
-        i = 0.0;
-        pErr = goal - initial;
-    }
 }
