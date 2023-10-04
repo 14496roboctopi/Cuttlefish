@@ -27,7 +27,7 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
         val direction:Pose = point.position.clone();
         direction.setOrigin(localizer.pos, true);
 
-        val dist: Double = direction.getVecLen();
+        val dist: Double = direction.getXYLength();
         direction.normalize();
 
         power = -translational_PD_ctrlr.update(dist);
@@ -65,7 +65,7 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
         direction.r = point.r;
 
 
-        val dist: Double = direction.getVecLen();
+        val dist: Double = direction.getXYLength();
         direction.normalize();
 
         power = -translational_PD_ctrlr.update(dist);

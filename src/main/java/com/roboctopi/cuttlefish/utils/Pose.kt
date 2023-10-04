@@ -56,17 +56,28 @@ class Pose(var x: Double = 0.0, var y: Double = 0.0, var r: Double = 0.0)
         this.y += sin(this.r + offset) * distance;
     }
 
-    fun setOrigin(input: Pose, rotate: Boolean = true)
+    /**
+     * Change the reference frame of the to another pose.
+     * Equivalent to subtract operation but with an added rotation transform.
+     * @param origin New origin
+     * @param rotate If set to true, the pose will be rotated around the origin by the origins R value
+     * */
+    fun setOrigin(origin: Pose, rotate: Boolean = true)
     {
-        this.x -= input.x;
-        this.y -= input.y;
+        this.x -= origin.x;
+        this.y -= origin.y;
         if(rotate)
         {
-            this.rotate(-input.r);
-            this.r -= input.r;
+            this.rotate(-origin.r);
+            this.r -= origin.r;
         }
     }
 
+    /**
+     * Subtract a this pose by another pose.
+     * @param input Pose to subtract from this pose
+     * @param rotate If false the rotation value will remain unaffected
+     * */
     fun subtract(input: Pose, rotate: Boolean = true)
     {
         this.x -= input.x;
@@ -77,17 +88,25 @@ class Pose(var x: Double = 0.0, var y: Double = 0.0, var r: Double = 0.0)
         }
     }
 
-    fun scale(amount: Double, rotate: Boolean = false)
+    /**
+     * Scale the pose
+     * @param scalar
+     * @param rotate if set to false rotation will not be affected
+     * */
+    fun scale(scalar: Double, rotate: Boolean = false)
     {
-        this.x *= amount;
-        this.y *= amount;
+        this.x *= scalar;
+        this.y *= scalar;
 
         if(rotate)
         {
-            this.r *= amount;
+            this.r *= scalar;
         }
     }
 
+    /**
+     * Normalize the position of the pose
+     * */
     fun normalize()
     {
         var len = this.getXYLength();
@@ -96,6 +115,12 @@ class Pose(var x: Double = 0.0, var y: Double = 0.0, var r: Double = 0.0)
         this.y /= len;
     }
 
+    /**
+     * Rotate the position of the pose around a pivot.
+     * NOTE: This does not affect the R value of the pose
+     * @param amount Amount to rotate
+     * @param pivot position to pivot around
+     * */
     fun rotate(amount:Double,pivot:Pose = Pose(0.0,0.0,0.0))
     {
         //Creates translated and normalized point

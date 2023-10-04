@@ -92,7 +92,7 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
         dMove.subtract(this.pPos,true);
 
         //Calculates speed
-        speed = dMove.getVecLen() / dTime;
+        speed = dMove.getXYLength() / dTime;
         localSpeed = moveStep;
         localSpeed.scale((1.0 / dTime),true);
         rSpeed = dMove.r / (dTime/1000.0);
@@ -114,7 +114,7 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
 
         val transDir = atan2(step.y, step.x);
 
-        val d = step.getVecLen();
+        val d = step.getXYLength();
         var a = step.r;
         if(a == 0.0) a = 0.000000000000001;
         val r = d / a;

@@ -90,6 +90,7 @@ class MotorPositionController(var goal:Double, var motor: Motor, var enc:RotaryE
      * Set target angle. As this directly controller the angle of the motor the setPosition is preferred.
      *
      * IMPORTANT: THIS WILL BYPASS THE POSITION LIMITS
+     * @param angle
      * */
     fun setAngle(angle:Double)
     {
@@ -99,6 +100,7 @@ class MotorPositionController(var goal:Double, var motor: Motor, var enc:RotaryE
     /**
      * Set the motor target position. The scale variable can be used to set the units of position.
      * @see scale
+     * @param position
      * */
     fun setPosition(position:Double)
     {
