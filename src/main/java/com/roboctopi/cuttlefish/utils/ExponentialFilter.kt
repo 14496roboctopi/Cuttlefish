@@ -12,7 +12,7 @@ package com.roboctopi.cuttlefish.utils
  *
  * d: New (noisy) data
  *
- * @param smoothing Smoothing coefficient
+ * @param smoothing Smoothing coefficient from 0-1. 0 is no smoothing and 1 is flat(data isn't added)
  * */
 class ExponentialFilter(val smoothing:Double){
     var state:Double = 0.0;

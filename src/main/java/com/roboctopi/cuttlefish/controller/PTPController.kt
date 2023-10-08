@@ -11,7 +11,7 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
 {
     //Var init
     var translational_PD_ctrlr:PID = PID(0.005, 0.0, 0.1);
-    var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.0,2.0);
+    var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.0,0.0);
     var movePowerAntistallThreshold = 0.2;
     var moveSpeedAntistallThreshold = 0.015;
     var rotatePowerAntistallThreshold = 0.0;

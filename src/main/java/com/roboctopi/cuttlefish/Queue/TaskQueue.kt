@@ -21,7 +21,7 @@ class TaskQueue
     var task: Task = NullTask();
     var paused = false;
     /**
-     * Execute the loop function of the current tasks and discard it if it is complete
+     * Execute the loop function of the current task and discard it if it is complete
      * */
     fun update()
     {
