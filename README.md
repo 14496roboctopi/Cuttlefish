@@ -58,7 +58,7 @@ CuttleRevHub exHub = new CuttleRevHub(hardwareMap,"Expansion Hub 2");
 Make sure to define the hub in init as when the constructor is called it will get the control hub using hardwareMap.
 The CuttleRevHub can be used to access hub spesific features such as reading battery voltage, and to retrieve other devices such as motors and servos. A detailed description of availible features can be found in the Cuttlefish reference documentation. 
 
-Devices can be obtains as follows:
+### Obtaining Devices
 Once a CuttleRevHub has been obtained it can be used to obtain devices. This can be done simply as follows:
 ```java
 CuttleMotor motor = controlHub.getMotor(1 /*Motor Port Number*/ );
@@ -69,8 +69,8 @@ CuttleDigital digital_sensor = hub.getDigital(3 /*Digital Port Number*/ );
 ```
 ***If you are using any sensors obtained from the hub, you must call the pullBulkData function of the hub every loop cycle in order for the sensors to function.*** This is because the sensors automatically use cached bulk data from the hub meaning that you have to tell the hub to get new bulk data each cycle or the devices won't update.
 
-### Initialized opmode
-As there is no longer a config file, a system will need to be created to replace it. There are different ways that you can do this, but we reccomend creating an "initialized opmode". This is an abstract class that initializes everything on your robot that you can extend instead of extending the default `OpMode` or `LinearOpMode` classes. This can be created in the same manner as a normal opmode would be created, except that `@TeleOp` or `@Autonomous` is ommited, and that it is declared as an abstract class instead of a normal class. We also reccomend that in your initialized opmode you extend GamepadOpmode or CuttlefishOpMode which are similar to the default iterative opmode except that it internally uses its own while loop as we have noticed intermitent performance problems in the iterative opmode loop. GamepadOpMode has built in functions that are called when buttons on the gamepad are pressed or released which is useful for TeleOp programming. Here is a basic example of an initialized OpMode:
+## Initialized opmode
+As there is no longer a config file, a system will need to be created to replace it. There are different ways that you can do this, but we reccomend creating an "initialized opmode". This is an abstract class that initializes everything on your robot that you can extend instead of extending the default `OpMode` or `LinearOpMode` classes. This can be created in the same manner as a normal opmode would be created, except that `@TeleOp` or `@Autonomous` is ommited, and that it is declared as an abstract class instead of a normal class. We also reccomend that in your initialized opmode you extend `GamepadOpmode` or `CuttlefishOpMode` which are similar to the default iterative opmode except that it internally uses its own while loop as we have noticed intermitent performance problems in the iterative opmode loop. `GamepadOpMode` has built in functions that are called when buttons on the gamepad are pressed or released which is useful for TeleOp programming. Here is a basic example of an initialized OpMode:
 ```java
 public abstractclass InitializedOpmode extends GamepadOpMode {
     public CuttleRevHub ctrlHub;
