@@ -38,3 +38,9 @@ Finally, locate the TeamCode build.gradle file. This is the build.gradle file th
 implementation project(path: ':cuttlefish')
 ```
 This adds cuttlefish as a dependency of your teamcode module allowing it to be used in teamcode.
+
+## Device System
+### CuttleRevHub
+The basis of the Cuttlefish device system it the CuttleRevHub object. It is an object that provides all extended functionality having to do with the rev hub (expansion or control) such as adjusting LED color and measuring battery voltage, and it is used to obtain other devices such as motors and servos. If you are using two hubs they will both have to be obtained seperately. The hubs can be obtained as follows:
+```
+CuttleRevHub ctrlHub = new CuttleRevHub(
