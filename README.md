@@ -67,4 +67,67 @@ CuttleServo servo = hub.getServo(2 /*Servo Port Number*/) ;
 CuttleAnalog analog_sensor = hub.getAnalog(2 /*Analog Port Number*/ );
 CuttleDigital digital_sensor = hub.getDigital(3 /*Digital Port Number*/ );
 ```
-Where the number being passed into the function is the port number of the device. **If you are using any sensors obtained from the hub, you must call the pullBulkData function of the hub every loop cycle in order for the sensors to function.** This is because the sensors automatically use cached bulk data from the hub instead of using
+***If you are using any sensors obtained from the hub, you must call the pullBulkData function of the hub every loop cycle in order for the sensors to function.*** This is because the sensors automatically use cached bulk data from the hub meaning that you have to tell the hub to get new bulk data each cycle or the devices won't update.
+
+### Initialized opmode
+As there is no longer a config file, a system will need to be created to replace it. There are different ways that you can do this, but we reccomend creating an "initialized opmode". This is an abstract class that initializes everything on your robot that you can extend instead of extending the default "OpMode" or "LinearOpMode" classes. This can be created in the same manner as a normal opmode would be created, except that @TeleOp or @Autonomous is ommited, and that it is declared as an abstract class instead of a normal class. We also reccomend that in your initialized opmode you extend GamepadOpmode or CuttlefishOpMode which are similar to the default iterative opmode except that it internally uses its own while loop as we have noticed intermitent performance problems in the iterative opmode loop. GamepadOpMode has built in functions that are called when buttons on the gamepad are pressed or released which is useful for TeleOp programming. Here is a basic example of an initialize OpMode:
+```java
+public class InitializedOpmode extends GamepadOpMode {
+    public CuttleRevHub ctrlHub;
+    public CuttleRevHub expHub;
+
+    public ChassisMotors chassis_motors;
+    public MecanumController chassis;
+    public ThreeEncoderLocalizer encoderLocalizer;
+
+    public PTPController ptpController;
+
+    public TaskQueue queue;
+
+    @Override
+    public void onInit()
+    {
+        ctrlHub = new CuttleRevHub(hardwareMap,CuttleRevHub.HubTypes.CONTROL_HUB);
+        expHub = new CuttleRevHub(hardwareMap,"Expansion Hub 2");
+        chassis_motors = new ChassisMotors();
+
+        chassis_motors.leftFrontMotor  = ctrlHub.getMotor(3);
+        chassis_motors.rightFrontMotor = ctrlHub.getMotor(2);
+        chassis_motors.rightBackMotor  = expHub.getMotor(2);
+        chassis_motors.leftBackMotor   = expHub.getMotor(3);
+
+        chassis_motors. leftBackMotor.setDirection(Direction.REVERSE);
+        chassis_motors.leftFrontMotor.setDirection(Direction.REVERSE);
+
+        CuttleEncoder leftEncoder  = expHub .getEncoder(3,720*4);
+        CuttleEncoder sideEncoder  = ctrlHub.getEncoder(0,720*4);
+        CuttleEncoder rightEncoder = ctrlHub.getEncoder(3,720*4);
+        leftEncoder.setDirection(Direction.REVERSE);
+
+        chassis = new MecanumController(chassis_motors.rightFrontMotor,chassis_motors.rightBackMotor,chassis_motors.leftFrontMotor,chassis_motors.leftBackMotor);
+        encoderLocalizer = new ThreeEncoderLocalizer(
+                leftEncoder  , // Left
+                sideEncoder  , // Side
+                rightEncoder , // Right
+                29,
+                130.5,
+                1.0
+        );
+
+        ptpController = new PTPController(chassis, encoderLocalizer);
+
+        queue = new TaskQueue();
+
+    }
+    @Override
+    public void main() {
+    }
+    public void mainLoop()
+    {
+        ctrlHub.pullBulkData();
+        expHub.pullBulkData();
+        encoderLocalizer.relocalize();
+        queue.update();
+    }
+}
+```
