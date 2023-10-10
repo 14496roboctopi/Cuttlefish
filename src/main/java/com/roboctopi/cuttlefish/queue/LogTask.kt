@@ -1,4 +1,4 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 /** Log a string to the console using System.out.println
  * @param text

@@ -1,7 +1,7 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 /** Runs two tasks concurrently. Will wait for both tasks to complete before moving on. This can be used with TaskList for complex behavior
- * @see com.roboctopi.cuttlefish.Queue.TaskList
+ * @see com.roboctopi.cuttlefish.queue.TaskList
  * @param task1
  * @param task2
  * */

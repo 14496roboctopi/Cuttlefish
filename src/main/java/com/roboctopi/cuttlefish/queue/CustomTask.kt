@@ -1,4 +1,4 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 /**
  * Task that allows you to execute code using a lambda

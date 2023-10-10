@@ -1,4 +1,4 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 import com.roboctopi.cuttlefish.localizer.Localizer
 

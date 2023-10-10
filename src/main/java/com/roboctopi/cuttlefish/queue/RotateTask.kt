@@ -1,8 +1,7 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 import com.roboctopi.cuttlefish.controller.PTPController
 import com.roboctopi.cuttlefish.utils.Pose
-import kotlin.math.abs
 
 
 /**Rotate the robot to a set angle or by a set amount

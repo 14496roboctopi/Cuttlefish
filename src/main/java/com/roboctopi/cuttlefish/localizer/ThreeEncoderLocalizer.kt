@@ -8,6 +8,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
+ * System to localize the robot using 3 - wheel odometry.
  * @param left Left encoder
  * @param side Side encoder
  * @param right Right encoder
@@ -52,6 +53,7 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     init {
         this.relocalize();
     }
+    /**Reset the position of the localizer to (0,0,0)*/
     override fun reset()
     {
         pEnc = Pose(l.getRotation(),r.getRotation(),s.getRotation());

@@ -1,8 +1,6 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.reflect.typeOf
 
 /**
  * The Task Queue is a scheduling system. It is a Queue to which Tasks can be added.

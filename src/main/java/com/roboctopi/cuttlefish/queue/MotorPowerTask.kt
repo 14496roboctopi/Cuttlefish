@@ -1,8 +1,6 @@
-package com.roboctopi.cuttlefish.Queue
+package com.roboctopi.cuttlefish.queue
 
 import com.roboctopi.cuttlefish.components.Motor
-import com.roboctopi.cuttlefish.components.RotaryEncoder
-import com.roboctopi.cuttlefish.utils.PID
 
 /** Set the power of a motor
  * @param power

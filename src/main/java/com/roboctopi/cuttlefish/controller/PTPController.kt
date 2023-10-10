@@ -7,22 +7,64 @@ import com.roboctopi.cuttlefish.utils.Pose
 import kotlin.math.PI
 import kotlin.math.abs
 
+/**
+ * Stands for Point-To-Point Controller. Is used to move the robot around the playing field autonomously using waypoints.
+ * Internally, this class uses a PD controller to control distance to the goal, and a PID controller to control rotation.
+ *
+ * There is a built in anti-stall system that detects if the robot is stalling and if it is, stops moving and signals to proceed to the next point.
+ * If the robot doesn't stall, it will keep traveling until it gets within a user defined distance to the target.
+ * The robot is considered stalled if the PD / PID power is low AND the bot is not moving both positionally and rotationally.
+ *
+ * @param controller The mecanum that the PTP Controller will control
+ * @param localizer The localizer that the PTP controller will use to determine its position. This uses the Localizer interface meaning that a custom localizer can be used here.
+ * */
 class  PTPController(var controller:MecanumController, var localizer: Localizer)
 {
     //Var init
+    /**
+     * PD controller for distance. Even though this takes a PID controller, the I component must not be set. 
+     * */
     var translational_PD_ctrlr:PID = PID(0.005, 0.0, 0.1);
+
+    /**
+     * PID Controller for bot rotation.
+     * */
     var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.0,0.0);
-    var movePowerAntistallThreshold = 0.2;
-    var moveSpeedAntistallThreshold = 0.015;
-    var rotatePowerAntistallThreshold = 0.0;
-    var rotateSpeedAntistallThreshold = 0.0;
+    class AntistallParams {
+        /**
+         * Minimum translational power for anti-stall to trigger.
+         * */
+        var movePowerAntistallThreshold = 0.2;
+        /**
+         * Minimum translational speed for anti-stall to trigger.
+         * */
+        var moveSpeedAntistallThreshold = 0.015;
+        /**
+         * Minimum rotation power for anti-stall to trigger.
+         * */
+        var rotatePowerAntistallThreshold = 0.0;
+        /**
+         * Minimum rotation speed for anti-stall to trigger.
+         * */
+        var rotateSpeedAntistallThreshold = 0.0;
+    }
+
+    /**
+     * Parameters for anti-stall.
+     * For anti stall to trigger ALL conditions must be met.
+     * */
+    var antistallParams: AntistallParams = AntistallParams();
     var rotationPowerLimit = 1.0;
 
+
+    /**
+     * Power being applied by the controller
+     * */
     var power:Double = 0.0
         private set
 
 
-    fun gotoPointLoop(point:Waypoint, endPoint: Pose = Pose(0.0, 0.0, 0.0)): Boolean {
+    fun gotoPointLoop(point:Waypoint): Boolean {
         //Find translation power
         val direction:Pose = point.position.clone();
         direction.setOrigin(localizer.pos, true);
@@ -38,8 +80,8 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
         direction.r = direction.r.coerceIn(-rotationPowerLimit,rotationPowerLimit);
 
 
-        val motionStalled = abs(power) < movePowerAntistallThreshold && localizer.speed<moveSpeedAntistallThreshold;
-        val rotationStalled = abs(direction.r) < rotatePowerAntistallThreshold && abs(localizer.rSpeed) < rotateSpeedAntistallThreshold;
+        val motionStalled = abs(power) < antistallParams.movePowerAntistallThreshold && localizer.speed<antistallParams.moveSpeedAntistallThreshold;
+        val rotationStalled = abs(direction.r) <antistallParams. rotatePowerAntistallThreshold && abs(localizer.rSpeed) < antistallParams.rotateSpeedAntistallThreshold;
 
         val rotationReached = abs(localizer.pos.r - direction.r) < point.rSlop;
         val positionReached = dist < point.tSlop;
