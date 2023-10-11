@@ -31,16 +31,17 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     var rad: Double = wheelRad;
     var dist: Double = wheelDist;
 
+    /***/
     var localSpeed:Pose = Pose(0.0,0.0,0.0);
 
     //Position var
     override var pos: Pose = Pose(0.0,0.0,0.0);
 
     //Preivious Enc Position
-    var pEnc: Pose = Pose(l.getRotation(),r.getRotation(),s.getRotation());
+    private var pEnc: Pose = Pose(l.getRotation(),r.getRotation(),s.getRotation());
 
     //Privious position
-    public  var pPos: Pose = Pose(0.0,0.0,0.0);
+    private var pPos: Pose = Pose(0.0,0.0,0.0);
 
     //Previous time
     private var pTime: Long = System.currentTimeMillis();
