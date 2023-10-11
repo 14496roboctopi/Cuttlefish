@@ -48,6 +48,8 @@ Left stick Y is negative because positive Y is downward on the controller.
 
 ### Three Encoder Localizer
 
+The three encoder localizer is used for encoder odometry
+
 ### Point to Point Controller
 
 ### Task Queue
