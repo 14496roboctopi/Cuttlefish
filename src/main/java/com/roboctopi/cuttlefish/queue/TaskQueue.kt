@@ -4,6 +4,7 @@ import java.util.*
 
 /**
  * The Task Queue is a scheduling system. It is a Queue to which Tasks can be added.
+ * A task is simply an object which contains a loop function which returns a boolean.
  * The loop function of the task at the front of the queue will be executed every update cycle until it returns true.
  * Once the task loop function returns true the task is discarded from the queue and the next task begins executing.
  * By using ForkTasks and TaskLists it is possible to create arbitrarily complex trees of tasks.
