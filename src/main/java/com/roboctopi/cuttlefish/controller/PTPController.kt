@@ -24,12 +24,12 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
     /**
      * PD controller for distance. Even though this takes a PID controller, the I component must not be set. 
      * */
-    var translational_PD_ctrlr:PID = PID(0.005, 0.0, 0.1);
+    var translational_PD_ctrlr:PID = PID(0.01, 0.0, 1.0/1000.0);
 
     /**
      * PID Controller for bot rotation.
      * */
-    var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.0,0.0);
+    var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.1,0.3);
     class AntistallParams {
         /**
          * Minimum translational power for anti-stall to trigger.
