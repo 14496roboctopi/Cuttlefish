@@ -86,7 +86,31 @@ The point to point controller is used to move the robot to waypoints on the play
 PTPController ptpController = new PTPController(chassis, encoderLocalizer);
 ```
 The PTPController is rarely used on its own and is rather used alongside the queue using [PointTasks](com.roboctopi.cuttlefish.queue.PointTask):
+```java
+queue.addTask(new PointTask(
+        new Waypoint(
+                new Pose(1000,0,0),
+                0.5 // Maximum power
+        ),
+        ptpController
+)); 
+```
+Point tasks allow you to move the robot to a position on the playing field and then to move on to another task.
 
+#### Tuning
+There are several parameters that can be tuned in the Point to Point controller. These are the PID Controllers, and the antistall system. There is two PID controllers. First is the rotational PID controller, which controls the angle of the bot, and second the translational PD controller which controls the position of the bot. The translational PD controlled does not have a signed error meaning that ***the I gain must be set to zero***. Here is how you set the controller coefficients:
+```java
+ptpController.setRotational_PID_ctrlr(new PID(rotational_p_gain,rotational_i_gain,rotational_d_gain));
+ptpController.setTranslational_PD_ctrlr(new PID(translation_p_gain,0,translation_d_gain));
+```
+The second tunable is the anti-stall system. The PTPController that detects if the robot is stalling, and if it is stalling, moves on the the next point. This prevents the robot from getting hung up trying to reach a target in auto. The robot is considered stalled if the PD / PID power is below a minimum threshold AND the bots positional and rotational speed is below a certain threshold. These thresholds can be manually tuned for your bot:
+```java
+ptpController.getAntistallParams().setMovePowerAntistallThreshold(0.15); // Maxmimum translational power where the bot is still stalled
+ptpController.getAntistallParams().setRotatePowerAntistallThreshold(0.15); // Maxmimum rotation power where the bot is still stalled
+ptpController.getAntistallParams().setMoveSpeedAntistallThreshold(0.015);  // Maximum speed in m/s for the bot to be considered stalled
+ptpController.getAntistallParams().setRotateSpeedAntistallThreshold(0.3); // Maximum rotation speed in rad/s for the bot to be considered stalled
+```
+Remember that ALL of these conditions must be met for the bot to be considered stalled.
 
 ### Task Queue
 The task queue is a scheduling system that allows for the execution of a tree of tasks that are synchronized with the main loop. Many processes, such as moving the robot to a certain position are occur over an extended period of time, and require code to be run with every cycle of the main loop. When multiple processes like this have to occur in series and/or paralell it can be problematic. To solve this problem we have created the task queue system. <br>
