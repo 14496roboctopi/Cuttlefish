@@ -188,6 +188,30 @@ queue.addTask(new CustomTask(()->{
 ```
 CustomTasks are useful in cases where you have some code that you want to run that you arent going to reuse, such setting the value of a spesific variable in your auto or . If there is something you will want to use more than once you make want 
 
+#### Conditionals
+Conditionals can be implemented through the use of task lists and custom tasks. TaskLists are essentially TaskQueues that can be added as tasks. They will update the same way a normal queue would when their loop function is called and are complete when they are empty. TaskLists are useful in this case as they allow you to insert tasks in the middle of the queue. Here is an example of a conditional:
+```java
+ TaskList conditional_list = new TaskList();
+queue.addTask(new CustomTask(()->{
+        if(CurrentAlliance.alliance == CurrentAlliance.AllianceTypes.RED)
+        {
+                conditional_list.addTask(new LogTask("Red Alliance"));
+                conditional_list.addTask(new DelayTask(1000));
+                conditional_list.addTask(new ServoTask(self_destruct_trigger,TRIGGER_ACTIVE_POSITION));
+        }
+        else
+        {
+                conditional_list.addTask(new LogTask("Blue Alliance"));
+                conditional_list.addTask(new DelayTask(1500));
+                conditional_list.addTask(new ServoTask(self_destruct_trigger,TRIGGER_INACTIVE_POSITION));
+        }
+        return true;
+}));
+queue.addTask(conditional_list);
+queue.addTask(new MotorPowerTask(1.0,launcher_motor));
+```
+
+#### Loops
 
 
 #### Why not just use a while loop for each task?
