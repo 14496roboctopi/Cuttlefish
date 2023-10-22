@@ -3,6 +3,45 @@
 
 ## Summary
 
+## Installation
+
+### Basic
+
+### Advanced
+Here is how to add cuttlefish to your project directly as a repository. This is useful if you are planning to modify the library yourself
+
+Clone Cuttlefish into the top level folder of your project. This can be done with the following command in git bash:
+```bash
+git clone https://github.com/14496roboctopi/CuttlefishFTCBridge
+```
+If you have forked the library then you can use the URL to your library instead. Note: Copy and pasting into the windows git bash is sometimes buggy, meaning that if you copy and paste this into the windows git bash it might throw an error if you don't retype certain parts of it.
+
+Another option instead of cloning the library in directly is to add it as a submodule. This is useful if you are using git for your project as it tells git to retrive the project from a seperate repository rather than including it in your main repoisitory. It can be added as a submodule using the following command:
+```bash
+git submodule add https://github.com/14496roboctopi/CuttlefishFTCBridge
+```
+DO NOT RUN THIS COMMAND IN ADDITION TO THE FIRST COMMAND. 
+If you choose to go with this option then you will need to push and pull the submodule seperately from the rest of your git. You will also need to run the commands git submodule init, and git submodule update whenever you set up a new copy of the repo on a different computer in order to pull the submodule into your project.
+
+Next, look for your project level build.gradle file. It can be found under gradle scripts and it should say (Project: the_name_of_your_project) in parentheses after build.gradle. In this file in the dependencies block add the following line:
+```groovy
+classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10'
+```
+This tells gradle to include the kotlin plugin in your project.
+
+Now open settings.gradle which can also be found under gradle scripts and add the following line:
+```groovy
+include ':cuttlefish'
+```
+This tells gradle that the cuttlefish folder is a module in your project.
+
+Finally, locate the TeamCode build.gradle file. This is the build.gradle file that says (Moduke: TeamCode) in parentheses. In the dependencies block of this file add the following line:
+```groovy
+implementation project(path: ':cuttlefish')
+```
+This adds cuttlefish as a dependency of your teamcode module allowing it to be used in teamcode.
+Make sure that after making changes to the gradle scripts that you click `sync now` in the top right of your code window.
+
 ## Components
 All components in the Cuttlefish library such as Motors, Encoders, and Servos are interfaces allowing for the use of Cuttlefish on different platforms. This means that a small amount of code needs to be written to bridge Cuttlefish with the platform SDK. We provide the <a href="/CuttlefishFTCBridge/index.html">CuttlefishFTCBridge</a> library to do this as well as to provide additional functionality. If you wish to use Cuttlefish without the CuttlefishFTCBridge library you will have to write your own implementations for the <a href="/cuttlefish/com.roboctopi.cuttlefish.components/index.html">Cuttlefish components interfaces</a>.
 
@@ -32,22 +71,33 @@ All four of these systems should be initialized in your <a href = "/CuttlefishFT
 The mecanum controller is the class that allows you to control your chassis. 
 In order to initialize the mecanum controller you need to get all four of the chassis driver motors and pass them into the constructor: 
 ```java
-CuttleMotor leftFrontMotor  = ctrlHub.getMotor(3);
-CuttleMotor rightFrontMotor = ctrlHub.getMotor(2);
-CuttleMotor rightBackMotor  = expHub .getMotor(2);
-CuttleMotor leftBackMotor   = expHub .getMotor(3);
+public CuttleMotor leftFrontMotor ;
+public CuttleMotor rightFrontMotor;
+public CuttleMotor rightBackMotor ;
+public CuttleMotor leftBackMotor  ;
+MecanumController chassis;
 
-leftBackMotor .setDirection(Direction.REVERSE);
-leftFrontMotor.setDirection(Direction.REVERSE);
+@Override
+public void onInit()
+{
+        leftFrontMotor  = ctrlHub.getMotor(3);
+        rightFrontMotor = ctrlHub.getMotor(2);
+        rightBackMotor  = expHub .getMotor(2);
+        leftBackMotor   = expHub .getMotor(3);
 
-MecanumController ctrlr = new MecanumController(rightFrontMotor,rightBackMotor,leftFrontMotor,leftBackMotor);
+        leftBackMotor .setDirection(Direction.REVERSE);
+        leftFrontMotor.setDirection(Direction.REVERSE);
+
+        chassis = new MecanumController(rightFrontMotor,rightBackMotor,leftFrontMotor,leftBackMotor);
+}
+
 ```
 Make sure to set the direction of motors such that the robot will move forward when the power of each motor is positive. <br>
 The mecanum controller can be used to control the robot using the setVec function. The setVec function takes a [Pose][com.roboctopi.cuttlefish.utils.Pose] object as an argument to describe the direction of motion. The Y value of the pose describes the power in the forward/backward direction, the X value of the pose describes the power in thn side to side direction, and the R value of the pose decribes the rotational power. Here is an example of how robot-centric driver control works using this system:
 ```java
 public void mainLoop()
 {
-    chassis.setVec(new Pose(gamepad1.left_stick_x,-gamepad1.left_stick_y,gamepad1.right_stick_x));
+    chassis.setVec(new Pose(gamepad1.left_stick_x,-gamepad1.left_stick_y,-gamepad1.right_stick_x));
 }
 ```
 Left stick Y is negative because positive Y is downward on the controller.
@@ -55,19 +105,29 @@ Left stick Y is negative because positive Y is downward on the controller.
 ### Three Encoder Localizer
 The three encoder localizer is used to determine the position of the robot using <a href="https://gm0.org/en/latest/docs/common-mechanisms/dead-wheels.html">deadwheel odometry</a>. To configure the odometry system you will need to know the the radius of the encoder wheel, and the distance between the two forward facing wheels. Here is an example of initialization:
 ```java
-CuttleEncoder leftEncoder  = expHub .getEncoder(3,720*4);
-CuttleEncoder sideEncoder  = ctrlHub.getEncoder(0,720*4);
-CuttleEncoder rightEncoder = ctrlHub.getEncoder(3,720*4);
-leftEncoder.setDirection(Direction.REVERSE);
+CuttleEncoder leftEncoder ;
+CuttleEncoder sideEncoder ;
+CuttleEncoder rightEncoder;
 
-ThreeEncoderLocalizer encoderLocalizer = new ThreeEncoderLocalizer(
-        leftEncoder  ,
-        sideEncoder  ,
-        rightEncoder ,
-        29, // Radius of the wheel in mm
-        130.5, // Distance between the two forward facing wheels in mm
-        1.0 //Calibration constant (see below)
-);
+ThreeEncoderLocalizer encoderLocalizer;
+
+@Override
+public void onInit()
+{
+        leftEncoder  = expHub .getEncoder(3,720*4);
+        sideEncoder  = ctrlHub.getEncoder(0,720*4);
+        rightEncoder = ctrlHub.getEncoder(3,720*4);
+        leftEncoder.setDirection(Direction.REVERSE);
+
+        encoderLocalizer = new ThreeEncoderLocalizer(
+                leftEncoder  ,
+                sideEncoder  ,
+                rightEncoder ,
+                29, // Radius of the wheel in mm
+                130.5, // Distance between the two forward facing wheels in mm
+                1.0 //Calibration constant (see below)
+        );
+}
 ```
 
 #### Rotation Calibration
@@ -186,7 +246,18 @@ queue.addTask(new CustomTask(()->{
     return done;
 }));
 ```
-CustomTasks are useful in cases where you have some code that you want to run that you arent going to reuse, such setting the value of a spesific variable in your auto or . If there is something you will want to use more than once you make want 
+CustomTasks are useful in cases where you have some code that you want to run that you arent going to reuse, such setting the value of a spesific variable in your auto. If there is something you will want to use more than once you may want to instead create a new task type by creating a class which implements the Task interface:
+```java
+class ServoPresetTask(val servo: CuttleServo, val preset: Int): Task
+{
+    override fun loop(): Boolean
+    {
+        servo.goToPreset(preset);
+        return true;
+    }
+}
+```
+
 
 #### Conditionals
 Conditionals can be implemented through the use of task lists and custom tasks. TaskLists are essentially TaskQueues that can be added as tasks. They will update the same way a normal queue would when their loop function is called and are complete when they are empty. TaskLists are useful in this case as they allow you to insert tasks in the middle of the queue. Here is an example of a conditional:
@@ -210,9 +281,6 @@ queue.addTask(new CustomTask(()->{
 queue.addTask(conditional_list);
 queue.addTask(new MotorPowerTask(1.0,launcher_motor));
 ```
-
-#### Loops
-
 
 #### Why not just use a while loop for each task?
 The main problem with using while loops is that is complicates conncurrent execution. If you just put a while loop in the same thread as your main loop, you will halt the main loop while the secondary while loop is running. If you put it in a different thread then it will not be synchronized with the main thread meaning that you may be sending motor power multiple times before getting new data or geting new data multiple times without sending motor power significantly reducing the effective loop speed. 
