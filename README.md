@@ -129,15 +129,43 @@ public void onInit()
         );
 }
 ```
+In order to use the ThreeEncoderLocalizer you will need to call the relocalize function in your main loop. You can get the positon of the robot as a [Pose][com.roboctopi.cuttlefish.utils.Pose] using the getPos function. 
+
+```java
+@Override
+public void mainLoop()
+{
+        encoderLocalizer.relocalize();
+        System.out.println(encoderLocalizer.getPos());
+        telemetry.addData("Localizer X:",encoderLocalizer.getPos().getX());
+        telemetry.addData("Localizer Y:",encoderLocalizer.getPos().getY());
+        telemetry.addData("Localizer R:",encoderLocalizer.getPos().getR());
+        telemetry.update();
+}
+
+```
+#### Testing
+One you have initialized your localizer you will need to test it to make sure everything is configured correctly. To do this, you will need to set up a way to log the localizer position. You can do this through telemetry as shown above, you can do it through [FTCDashboard](https://acmerobotics.github.io/ftc-dashboard/features#telemetry) if you have it installed, or you can do it through System.out.println if you are connected over wireless ADB. Once you have some way of logging the localizer position, you should run the following tests:
+
+1. Restart the code and then push the robot directly forward and observe the localizer position. The Y coordinate should increase, and the X and R coordinates should remain near zero. If the Y coordinate decreases (goes negative), while X and R stay near zero, reverse both of your forward facing encoders using the [setDirection](/CuttlefishFTCBridge/com.roboctopi.cuttlefishftcbridge.devices/-cuttle-encoder/set-direction.html) function.  If the R coordinate increases instead of Y, try reversing just one of the forward facing encoders. If this doesn't work, either your encoder ports are configured incorrectly, or one or more of your encoders are disconnected. You can debug this by logging the angle of each encoder and then spinning the wheels by hand to make sure they are all connected and match up.
+2. Restart the code and push the bot directly to the right and observe the localizer position. The X coordinate should increase. If the X coordinate decreases, reverse the sideways encoder. If the X coordinate doesnt change, or the other coordinates change significantly, your encoders are wired incorrectly.
+3. Restart the code and rotate the robot counter-clockwise by 90 degrees. The R coordinate of the localizer should increase by approximately 1.57 (90 degrees in radians). If it instead decreases, make the calibration constant negative to reverse the direction of rotation.
+4. Restart the code and spin your robot around 10 times. Make sure that that you do this precisly and align the robot to something with a fixed rotation such as a tile before and after rotating it. The R coordinate of your localizer should be equal to 20*pi. If it varies from this significantly (more than ~0.2-0.5) you should calibrate rotation (see below)
+5. Restart the code and push the robot forward a set distance (e.g. 1 meter) and make sure that the distance reported by the localizer is the same as the distance the robot actually moved. Repeat this with the robot moving sideways.
+6. Place the robot at the edge of a field tile and restart the code. Push the robot directly forward by a meter or two, rotate the bot 90 degrees, and then push the robot back to its starting position. Once it is back where it started, rotate the bot 90 degrees back to its original orientation and line it up with the field tile. The localizer should report that the position is at (0X, 0Y, 0R) +- a few centimeters or +- a few 0.01 radians.
+
+
 
 #### Rotation Calibration
-If you wish to improve rotational accuracy you can calibrate the odometry rotationally to account for any inaccuracy in your distance measurement between the two forward facing odometry wheels. This can be done by adjusting the rotaryCalibrationConstant which scales rotation. The rotaryCalibrationConstant can be determined by spining the robot a fixed number of times (e.g. 20 times) dividing the actual number of rotation by the number of times that the robot thinks that it rotated. Formula:
+If you wish to improve rotational accuracy you can calibrate the odometry rotationally to account for any inaccuracy in your distance measurement between the two forward facing odometry wheels. This can be done by adjusting the rotaryCalibrationConstant which scales rotation. The rotaryCalibrationConstant can be determined by spining the robot a fixed number of times (e.g. 20 times) dividing that number(n) by the number of times that the robot thinks that it rotated(r). Remember that the localizer gives an output of radians so you will have to convert those to rotations by dividing by 2pi.
 ```
 n: Actual number of rotations
+a: Robot angle as determined by the localizer
 r: Robot rotation as measured by localizer
 C: Calibration constant
 
-C = 2πn/r
+r = a/(2π)
+C = n/r = 2πn/a
 ```
 
 ### Point to Point Controller
