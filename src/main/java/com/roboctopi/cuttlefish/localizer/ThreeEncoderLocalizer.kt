@@ -31,8 +31,11 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     var rad: Double = wheelRad;
     var dist: Double = wheelDist;
 
-    /***/
-    var localSpeed:Pose = Pose(0.0,0.0,0.0);
+    /**Velocity in robot space*/
+    var localVelocity:Pose = Pose(0.0,0.0,0.0);
+
+    /**Velocity in absolute space*/
+    var velocity:Pose = Pose(0.0,0.0,0.0);
 
     //Position var
     override var pos: Pose = Pose(0.0,0.0,0.0);
@@ -96,10 +99,19 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
         dMove.subtract(this.pPos,true);
 
         //Calculates speed
-        speed = dMove.getXYLength() / dTime;
-        localSpeed = moveStep;
-        localSpeed.scale((1.0 / dTime),true);
-        rSpeed = dMove.r / (dTime/1000.0);
+//        speed = dMove.getXYLength() / dTime;
+//        localSpeed = moveStep;
+//        localSpeed.scale((1.0 / dTime),true);
+//        rSpeed = dMove.r / (dTime/1000.0);
+        localVelocity = calcMovementStep(Pose(l.getVelocity(),r.getVelocity(),s.getVelocity()));
+        speed = localVelocity.getXYLength();
+        rSpeed = localVelocity.r;
+
+        velocity.r = localVelocity.r;
+        velocity.x = localVelocity.x;
+        velocity.y = localVelocity.y;
+
+        velocity.rotate(-pos.r);
 
         //Sets previous variables
         pTime = t;

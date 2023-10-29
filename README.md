@@ -1,7 +1,12 @@
 # Module Cuttlefish
 
 
-## Summary
+## Overview
+Cuttlefish is an FTC oriented library 
+
+### Features
+- Task queue
+    - The task queue
 
 ## Installation
 
