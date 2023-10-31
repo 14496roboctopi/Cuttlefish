@@ -48,7 +48,7 @@ include ':cuttlefish'
 ```
 This tells gradle that the cuttlefish folder is a module in your project.
 
-Finally, locate the TeamCode build.gradle file. This is the build.gradle file that says (Moduke: TeamCode) in parentheses. In the dependencies block of this file add the following line:
+Finally, locate the TeamCode build.gradle file. This is the build.gradle file that says (Module: TeamCode) in parentheses. In the dependencies block of this file add the following line:
 ```groovy
 implementation project(path: ':cuttlefish')
 ```
@@ -368,4 +368,4 @@ queue.addTask(new MotorPowerTask(1.0,launcher_motor));
 ```
 
 #### Why not just use a while loop for each task?
-The main problem with using while loops is that is complicates conncurrent execution. If you just put a while loop in the same thread as your main loop, you will halt the main loop while the secondary while loop is running. If you put it in a different thread then it will not be synchronized with the main thread meaning that you may be sending motor power multiple times before getting new data or geting new data multiple times without sending motor power significantly reducing the effective loop speed. 
+The main problem with using while loops is that is complicates concurrent execution. If you just put a while loop in the same thread as your main loop, you will halt the main loop while the secondary while loop is running. If you put it in a different thread then it will not be synchronized with the main thread meaning that you may be sending motor power multiple times before getting new data or getting new data multiple times without sending motor power significantly reducing the effective loop speed. 
