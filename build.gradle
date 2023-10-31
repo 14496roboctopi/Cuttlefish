@@ -1,15 +1,94 @@
 plugins {
     id 'java-library'
     id 'kotlin'
+    id 'maven-publish'
+    id 'signing'
 }
+
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
+//    withSourcesJar()
+//    withJavadocJar()
 }
+//tasks.javadocJar.configure {
+//    actions.clear()
+//    javadocJar.dependsOn(dokkaJavadoc)
+//    archiveClassifier = 'javadoc'
+//    from "build/dokka/javadoc"
+//}
+
+task dokkaJavadocJar(type: Jar) {
+    dokkaJavadocJar.dependsOn(dokkaJavadoc)
+    archiveClassifier = 'javadoc'
+    from "build/dokka/javadoc"
+}
+task sourcesJar(type: Jar) {
+    dokkaJavadocJar.dependsOn(dokkaJavadoc)
+    archiveClassifier = 'sources'
+    from "src/main/java"
+}
+//
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+publishing {
+    publications {
 
 
+        release(MavenPublication) {
+            artifactId = "Cuttlefish"
+            version = "1.0.0"
+            groupId = 'com.roboctopi'
+            from components.java
+            pom {
+                signing {
+                    sign publishing.publications.release
+                    sign configurations.archives
+                }
+                name = group+":"+archivesBaseName
+                description = 'Cuttlefish is a FTC oriented robotics library designed to make both the robot programming process, and the resulting code, simpler, faster and better.'
+                url = 'https://14496roboctopi.github.io/cuttlefish/'
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'lmarsbrown'
+                        name = 'Logan Brown'
+                        email = 'lmarsbrown@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/14496roboctopi/Cuttlefish.git'
+                    developerConnection = 'scm:git:ssh://github.com:14496roboctopi/Cuttlefish.git'
+                    url = 'https://github.com/14496roboctopi/Cuttlefish'
+                }
+            }
+            artifact dokkaJavadocJar
+            artifact sourcesJar
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = properties.getProperty("ossrhUsername")
+                password = properties.getProperty("ossrhPassword")
+            }
+
+        }
+    }
+}
 
 //import org.jetbrains.dokka.gradle.DokkaTask
 

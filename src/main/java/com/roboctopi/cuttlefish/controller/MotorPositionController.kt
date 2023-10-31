@@ -1,4 +1,4 @@
-package com.roboctopi.cuttlefish.utils
+package com.roboctopi.cuttlefish.controller
 
 import com.roboctopi.cuttlefish.components.Motor
 import com.roboctopi.cuttlefish.components.RotaryEncoder
@@ -20,8 +20,9 @@ import com.roboctopi.cuttlefish.utils.PID
  * @param goal Initial goal
  * @param motor Motor to be controller
  * @param enc Motor encoder
+ * @param useHardwareVelocity Whether velocity should be obtained directly from the encoder
  * */
-class MotorPositionController(var goal:Double, var motor: Motor, var enc:RotaryEncoder)
+class MotorPositionController(var goal:Double, var motor: Motor, var enc:RotaryEncoder, var useHardwareVelocity:Boolean=true)
 {
     public var pid:PID = PID(1.5,0.3,0.0);
     private var initial = 0.0;
@@ -65,7 +66,14 @@ class MotorPositionController(var goal:Double, var motor: Motor, var enc:RotaryE
     fun loop() {
         if(enabled)
         {
-            motor.setPower(pid.update(enc.getRotation(),goal+initial));
+            if(useHardwareVelocity)
+            {
+                motor.setPower(pid.update(enc.getRotation(),enc.getVelocity(),goal+initial));
+            }
+            else
+            {
+                motor.setPower(pid.update(enc.getRotation(),goal+initial));
+            }
         }
     }
     /**

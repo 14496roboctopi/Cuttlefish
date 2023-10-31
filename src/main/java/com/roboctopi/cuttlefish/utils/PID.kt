@@ -21,6 +21,7 @@ open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: 
     open var reiniting = false;
 
     open var power: Double = 0.0;
+
     private var pTime: Long = System.nanoTime();
 
     /**
@@ -51,6 +52,35 @@ open class PID(open var pGain: Double, open var iGain: Double, open var  dGain: 
         pTime = tNano;
         return power;
     }
+    /**
+     * Update PID control loop
+     * @param state New state
+     * @param velocity Current rate of change of the state
+     * @param goal
+     * */
+    open fun update(state: Double, velocity:Double,goal: Double = 0.0): Double
+    {
+        p = goal - state;
+
+        if(reiniting)
+        {
+            reiniting = false
+            pErr=p;
+        }
+
+        var tNano = System.nanoTime();
+
+        var dT = (tNano - pTime).toDouble() / (1000.0*1000.0*1000.0);
+
+        i += iGain * p * dT;
+        i = max(min(i, iLimit), -iLimit);
+        d = -velocity;
+        power = pGain * p + i + d * dGain;
+
+        pTime = tNano;
+        return power;
+    }
+
     /**
      * Clears the Integral and derivative values.
      * This should be used if a PID controller has not been in use for an extend period of time (more than a loop cycle) to avoid extreme integral build up.

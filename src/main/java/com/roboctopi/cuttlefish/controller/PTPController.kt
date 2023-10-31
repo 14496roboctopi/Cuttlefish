@@ -25,12 +25,12 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
     /**
      * PD controller for distance. Even though this takes a PID controller, the I component must not be set. 
      * */
-    var translational_PD_ctrlr:PID = PID(0.01, 0.0, 1.0/1000.0);
+    var translational_PD_ctrlr:PID = PID(0.04, 0.0, 3.0/1000.0);
 
     /**
      * PID Controller for bot rotation.
      * */
-    var rotational_PID_ctrlr:PID = PID(PI * 0.5,0.1,0.3);
+    var rotational_PID_ctrlr:PID = PID(PI * 1.75,0.0,0.3,0.0,0.35);
     class AntistallParams {
         /**
          * Minimum translational power for anti-stall to trigger.
@@ -77,19 +77,20 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
 
         val dist: Double = direction.getXYLength();
         direction.normalize();
+        val trans_velocity = direction.x*localizer.localVelocity.x+direction.y*localizer.localVelocity.y
 
         power = -translational_PD_ctrlr.update(dist);
 
         direction.scale(power.coerceAtMost(point.maxPower),false);
 
-        direction.r = rotational_PID_ctrlr.update(localizer.pos.r,point.position.r);
+        direction.r = rotational_PID_ctrlr.update(localizer.pos.r,localizer.velocity.r,point.position.r);
         direction.r = direction.r.coerceIn(-rotationPowerLimit,rotationPowerLimit);
 
 
         val motionStalled = abs(power) < antistallParams.movePowerAntistallThreshold && localizer.speed<antistallParams.moveSpeedAntistallThreshold;
-        val rotationStalled = abs(direction.r) <antistallParams. rotatePowerAntistallThreshold && abs(localizer.rSpeed) < antistallParams.rotateSpeedAntistallThreshold;
+        val rotationStalled = abs(direction.r) <antistallParams. rotatePowerAntistallThreshold && abs(localizer.velocity.r) < antistallParams.rotateSpeedAntistallThreshold;
 
-        val rotationReached = abs(localizer.pos.r - direction.r) < point.rSlop;
+        val rotationReached = abs(localizer.pos.r - point.position.r) < point.rSlop;
         val positionReached = dist < point.tSlop;
 
 

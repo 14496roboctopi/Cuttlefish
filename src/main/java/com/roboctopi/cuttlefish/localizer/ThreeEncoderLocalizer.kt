@@ -32,10 +32,10 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     var dist: Double = wheelDist;
 
     /**Velocity in robot space*/
-    var localVelocity:Pose = Pose(0.0,0.0,0.0);
+    override var localVelocity:Pose = Pose(0.0,0.0,0.0);
 
     /**Velocity in absolute space*/
-    var velocity:Pose = Pose(0.0,0.0,0.0);
+    override var velocity:Pose = Pose(0.0,0.0,0.0);
 
     //Position var
     override var pos: Pose = Pose(0.0,0.0,0.0);
@@ -51,12 +51,11 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
 
     //Speed
     override var speed = 0.0;
-    override var rSpeed = 0.0;
 
     var sidesum = 0.0;
 
     init {
-        this.relocalize();
+        this.update();
     }
     /**Reset the position of the localizer to (0,0,0)*/
     override fun reset()
@@ -70,7 +69,7 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
     /**
      * Update robot position based on encoder data
      */
-    override fun relocalize()
+    override fun update()
     {
         //Gets enc position
         val nEnc = Pose(l.getRotation(), r.getRotation(), s.getRotation());
@@ -105,13 +104,12 @@ class ThreeEncoderLocalizer(left: RotaryEncoder, side: RotaryEncoder, right: Rot
 //        rSpeed = dMove.r / (dTime/1000.0);
         localVelocity = calcMovementStep(Pose(l.getVelocity(),r.getVelocity(),s.getVelocity()));
         speed = localVelocity.getXYLength();
-        rSpeed = localVelocity.r;
 
         velocity.r = localVelocity.r;
         velocity.x = localVelocity.x;
         velocity.y = localVelocity.y;
 
-        velocity.rotate(-pos.r);
+        velocity.rotate(pos.r);
 
         //Sets previous variables
         pTime = t;

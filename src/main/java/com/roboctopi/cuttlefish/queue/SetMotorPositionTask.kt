@@ -1,6 +1,6 @@
 package com.roboctopi.cuttlefish.queue
 
-import com.roboctopi.cuttlefish.utils.MotorPositionController
+import com.roboctopi.cuttlefish.controller.MotorPositionController
 
 /**
  * Set the position of a motor using a MotorPositionController
@@ -8,7 +8,7 @@ import com.roboctopi.cuttlefish.utils.MotorPositionController
  * @param position target position
  * @param ctrlr Motor position controller
  * */
-class SetMotorPositionTask(val position:Double, val ctrlr:MotorPositionController): Task
+class SetMotorPositionTask(val position:Double, val ctrlr: MotorPositionController): Task
 {
     override fun loop(): Boolean
     {

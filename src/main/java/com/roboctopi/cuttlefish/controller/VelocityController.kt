@@ -1,4 +1,6 @@
-package com.roboctopi.cuttlefish.utils
+package com.roboctopi.cuttlefish.controller
+
+import com.roboctopi.cuttlefish.utils.PID
 
 class VelocityController(p: Double, i: Double, d: Double,var feedForwardM:Double,var feedForwardB:Double)
 {

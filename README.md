@@ -95,8 +95,10 @@ public void onInit()
 
         chassis = new MecanumController(rightFrontMotor,rightBackMotor,leftFrontMotor,leftBackMotor);
 }
-
 ```
+***The Mecanum Controller MUST be initialized AFTER the motors.***
+<br>
+
 Make sure to set the direction of motors such that the robot will move forward when the power of each motor is positive. <br>
 The mecanum controller can be used to control the robot using the setVec function. The setVec function takes a [Pose][com.roboctopi.cuttlefish.utils.Pose] object as an argument to describe the direction of motion. The Y value of the pose describes the power in the forward/backward direction, the X value of the pose describes the power in thn side to side direction, and the R value of the pose decribes the rotational power. Here is an example of how robot-centric driver control works using this system:
 ```java
@@ -134,13 +136,16 @@ public void onInit()
         );
 }
 ```
-In order to use the ThreeEncoderLocalizer you will need to call the relocalize function in your main loop. You can get the positon of the robot as a [Pose][com.roboctopi.cuttlefish.utils.Pose] using the getPos function. 
+***The Localizer MUST be initialized AFTER the encoders are initialized and configured.***
+<br>
+
+In order to use the ThreeEncoderLocalizer you will need to call the update function in your main loop. You can get the positon of the robot as a [Pose][com.roboctopi.cuttlefish.utils.Pose] using the getPos function. 
 
 ```java
 @Override
 public void mainLoop()
 {
-        encoderLocalizer.relocalize();
+        encoderLocalizer.update();
         System.out.println(encoderLocalizer.getPos());
         telemetry.addData("Localizer X:",encoderLocalizer.getPos().getX());
         telemetry.addData("Localizer Y:",encoderLocalizer.getPos().getY());
@@ -176,8 +181,20 @@ C = n/r = 2πn/a
 ### Point to Point Controller
 The point to point controller is used to move the robot to waypoints on the playing field. It needs a mecanum controller and a localizer to be intialized:
 ```java
-PTPController ptpController = new PTPController(chassis, encoderLocalizer);
+public class InitializedOpmode extends GamepadOpMode 
+{        
+    PTPController ptpController
+    public void onInit()
+    {
+        //Init Mecanum Controller Here
+        //Init Localizer Here
+        ptpController = new PTPController(chassis, encoderLocalizer);
+    }
+}
 ```
+***The PTPController MUST be initialized AFTER the Mecanum Controller and Localizer are initialized.***
+<br>
+
 The PTPController is rarely used on its own and is rather used alongside the queue using [PointTasks](com.roboctopi.cuttlefish.queue.PointTask):
 ```java
 queue.addTask(new PointTask(
@@ -214,13 +231,19 @@ The task queue has similar functionality to a state machine, but with several ke
 - It structured linearly such that it is unlikely for unforseen behieviour to arise, while still allowing arbitrarily complex instructions
 <br><br>
 
+The task queue is intitialized as follows:
+```java
+public class InitializedOpmode extends GamepadOpMode {
+    TaskQueue queue = new TaskQueue();
+    public void onInit()
+    {
+        ...
+    }
+}
+```
+
 Here is an example of how you could use the task queue to move forward 1 meter, go sideways 1 meter while turning 90 degrees, open a servo to drop an element off, and then return to the robots original position diagonally:
 ```java
-package org.firstinspires.ftc.teamcode.data_collection;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.roboctopi.cuttlefish.utils.Pose;
-import org.firstinspires.ftc.teamcode.InitializedOpmode;
-
 @TeleOp(name="Queue Example", group="Example")
 public class QueueExample extends InitializedOpmode {
     
