@@ -48,7 +48,7 @@ publishing {
                     sign publishing.publications.release
                     sign configurations.archives
                 }
-                name = group+":"+archivesBaseName
+                name = groupId+":"+archivesBaseName
                 description = 'Cuttlefish is a FTC oriented robotics library designed to make both the robot programming process, and the resulting code, simpler, faster and better.'
                 url = 'https://14496roboctopi.github.io/cuttlefish/'
                 licenses {

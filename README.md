@@ -1,19 +1,27 @@
 # Module Cuttlefish
 
-
 ## Overview
-Cuttlefish is an FTC oriented library 
+Cuttlefish is an FTC oriented library designed to make both the robot programming process, and the resulting code, simpler, faster and better. It contains a variety of features including deadwheel odometry, waypoint based navigation, and queue based task scheduling system. Cuttlefish is designed to be modular and extendable so that you can easily use it to augment rather than replace your own code.
 
 ### Features
-- Task queue
-    - The task queue
+- Deadwheel Localizer
+- Mecanum Control
+- Waypoint Navigation
+- Task Queue (Modular Scheduling System)
+- Built in Tasks for Task Queue
+- Motor Position Control
+- Motor Velocity Control
 
 ## Installation
 
 ### Basic
+Open build.dependencies.gradle and add the following line to the dependecies sections
+```groovy
+implementation 'com.roboctopi:Cuttlefish:1.0.0'
+```
 
 ### Advanced
-Here is how to add cuttlefish to your project directly as a repository. This is useful if you are planning to modify the library yourself
+Here is how to add Cuttlefish to your project directly as a repository. This is useful if you are planning to modify the library yourself
 
 Clone Cuttlefish into the top level folder of your project. This can be done with the following command in git bash:
 ```bash
@@ -198,11 +206,11 @@ public class InitializedOpmode extends GamepadOpMode
 The PTPController is rarely used on its own and is rather used alongside the queue using [PointTasks](com.roboctopi.cuttlefish.queue.PointTask):
 ```java
 queue.addTask(new PointTask(
-        new Waypoint(
-                new Pose(1000,0,0),
-                0.5 // Maximum power
-        ),
-        ptpController
+    new Waypoint(
+        new Pose(1000,0,0),
+        0.5 // Maximum power
+    ),
+    ptpController
 )); 
 ```
 Point tasks allow you to move the robot to a position on the playing field and then to move on to another task.
@@ -210,22 +218,41 @@ Point tasks allow you to move the robot to a position on the playing field and t
 #### Tuning
 There are several parameters that can be tuned in the Point to Point controller. These are the PID Controllers, and the antistall system. There is two PID controllers. First is the rotational PID controller, which controls the angle of the bot, and second the translational PD controller which controls the position of the bot. The translational PD controlled does not have a signed error meaning that ***the I gain must be set to zero***. Here is how you set the controller coefficients:
 ```java
-ptpController.setRotational_PID_ctrlr(new PID(rotational_p_gain,rotational_i_gain,rotational_d_gain));
-ptpController.setTranslational_PD_ctrlr(new PID(translation_p_gain,0,translation_d_gain));
+ptpController.setTranslational_PD_ctrlr(new PID(translation_p_gain,0,translation_d_gain,0.0,maximumIntegralPower));
+ptpController.setRotational_PID_ctrlr(new PID(rotational_p_gain,rotational_i_gain,rotational_d_gain,0.0,maximumIntegralPower));
 ```
+Here is a good starting point for tuning your PIDs:
+```java
+ptpController.setTranslational_PD_ctrlr(new PID( 
+    0.02,  // Proportional
+    0.0,   // Integral
+    0.002, // Derivative
+    0.0,   // Initial value (should be zero)
+    1.0    // Maximum integral power (to prevent integral windup)
+));
+ptpController.setRotational_PID_ctrlr(new PID(
+    3,  // Proportional
+    0.0,   // Integral
+    0.2, // Derivative
+    0.0,   // Initial value (should be zero)
+    1.0    // Maximum integral power (to prevent integral windup)
+));
+```
+Information on how to tune a PID controller can be found [here](https://gm0.org/en/latest/docs/software/concepts/control-loops.html#tuning-a-pid-loop).
+
 The second tunable is the anti-stall system. The PTPController that detects if the robot is stalling, and if it is stalling, moves on the the next point. This prevents the robot from getting hung up trying to reach a target in auto. The robot is considered stalled if the PD / PID power is below a minimum threshold AND the bots positional and rotational speed is below a certain threshold. These thresholds can be manually tuned for your bot:
 ```java
-ptpController.getAntistallParams().setMovePowerAntistallThreshold(0.15); // Maxmimum translational power where the bot is still stalled
-ptpController.getAntistallParams().setRotatePowerAntistallThreshold(0.15); // Maxmimum rotation power where the bot is still stalled
+ptpController.getAntistallParams().setMovePowerAntistallThreshold(0.2); // Maxmimum translational power where the bot is still stalled
+ptpController.getAntistallParams().setRotatePowerAntistallThreshold(0.2); // Maxmimum rotation power where the bot is still stalled
 ptpController.getAntistallParams().setMoveSpeedAntistallThreshold(0.015);  // Maximum speed in m/s for the bot to be considered stalled
 ptpController.getAntistallParams().setRotateSpeedAntistallThreshold(0.3); // Maximum rotation speed in rad/s for the bot to be considered stalled
 ```
-Remember that ALL of these conditions must be met for the bot to be considered stalled.
+Remember that ALL of these conditions must be met for the bot to be considered stalled. You can the power values should be set to slightly above the maximum power at which your bot stalls, and you can raise the speed thresholds if the robot is not moving on from a stall condition and you can lower the speed thresholds if the robot is detecting a stall too quickly.
 
 ### Task Queue
-The task queue is a scheduling system that allows for the execution of a tree of tasks that are synchronized with the main loop. Many processes, such as moving the robot to a certain position are occur over an extended period of time, and require code to be run with every cycle of the main loop. When multiple processes like this have to occur in series and/or paralell it can be problematic. To solve this problem we have created the task queue system. <br>
+The task queue is a scheduling system that allows for the execution of a tree of tasks that are synchronized with the main loop. Many processes, such as moving the robot to a certain position are occur over an extended period of time, and require code to be run with every cycle of the main loop. When multiple processes like this have to occur in series and/or parallel it can be problematic. To solve this problem we have created the task queue system. <br>
 The task queue as you might guess based on the name is a list of tasks. Each task is an object that implements the [Task][com.roboctopi.cuttlefish.queue.Task] interface. The task interface specifies that all tasks must have a loop function. The loop function of the task at the front of the queue will be executed every time the queue [update][com.roboctopi.cuttlefish.queue.TaskQueue.update] function is called, until it returns true, at which point it is discarded from the queue. The queue is first in, first out, meaning that tasks will be executed in the same order as they are added to the queue. <br>
-The task queue has similar functionality to a state machine, but with several key advantages.:
+The task queue has similar functionality to a state machine, but with several key advantages:
 - It has modular tasks meaning that common actions can easily be reused
 - It is capable of executing multiple tasks concurrently 
 - It structured linearly such that it is unlikely for unforseen behieviour to arise, while still allowing arbitrarily complex instructions
@@ -241,6 +268,8 @@ public class InitializedOpmode extends GamepadOpMode {
     }
 }
 ```
+
+
 
 Here is an example of how you could use the task queue to move forward 1 meter, go sideways 1 meter while turning 90 degrees, open a servo to drop an element off, and then return to the robots original position diagonally:
 ```java

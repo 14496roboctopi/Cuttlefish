@@ -25,12 +25,12 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
     /**
      * PD controller for distance. Even though this takes a PID controller, the I component must not be set. 
      * */
-    var translational_PD_ctrlr:PID = PID(0.04, 0.0, 3.0/1000.0);
+    var translational_PD_ctrlr:PID = PID(0.02, 0.0, 2.0/1000.0);
 
     /**
      * PID Controller for bot rotation.
      * */
-    var rotational_PID_ctrlr:PID = PID(PI * 1.75,0.0,0.3,0.0,0.35);
+    var rotational_PID_ctrlr:PID = PID(PI * 1,0.0,0.2,0.0,0.35);
     class AntistallParams {
         /**
          * Minimum translational power for anti-stall to trigger.
@@ -64,6 +64,24 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
     var power:Double = 0.0
         private set
 
+    /**
+     * True if the robots translational power is less than movePowerAntistallThreshold
+     * */
+    var motionPowerStalled = false;
+    /**
+     * True if the robots translational speed is less than moveSpeedAntistallThreshold
+     * */
+    var motionSpeedStalled = false;
+
+    /**
+     * True if the robots rotational power is less than rotatePowerAntistallThreshold
+     * */
+    var rotationPowerStalled = false;
+    /**
+     * True if the robots rotational speed is less than rotateSpeedAntistallThreshold
+     * */
+    var rotationSpeedStalled = false;
+
 
     /**
      * Go towards a waypoint until it is reached. Used by PointTask.
@@ -87,8 +105,13 @@ class  PTPController(var controller:MecanumController, var localizer: Localizer)
         direction.r = direction.r.coerceIn(-rotationPowerLimit,rotationPowerLimit);
 
 
-        val motionStalled = abs(power) < antistallParams.movePowerAntistallThreshold && localizer.speed<antistallParams.moveSpeedAntistallThreshold;
-        val rotationStalled = abs(direction.r) <antistallParams. rotatePowerAntistallThreshold && abs(localizer.velocity.r) < antistallParams.rotateSpeedAntistallThreshold;
+        motionPowerStalled = abs(power) < antistallParams.movePowerAntistallThreshold;
+        motionSpeedStalled = localizer.speed<antistallParams.moveSpeedAntistallThreshold;
+        val motionStalled = motionPowerStalled && motionSpeedStalled;
+
+        rotationPowerStalled = abs(direction.r) <antistallParams. rotatePowerAntistallThreshold;
+        rotationSpeedStalled = abs(localizer.velocity.r) < antistallParams.rotateSpeedAntistallThreshold;
+        val rotationStalled = rotationPowerStalled && rotationSpeedStalled;
 
         val rotationReached = abs(localizer.pos.r - point.position.r) < point.rSlop;
         val positionReached = dist < point.tSlop;
